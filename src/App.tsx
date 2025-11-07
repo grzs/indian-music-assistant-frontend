@@ -4,66 +4,102 @@ import viteLogo from '/vite.svg'
 import './App.css'
 
 const testData = {
-  "slug": "anandi-jagabandi",
-  "lines": [
-    {
-      "matras": [
-        {
-          "syllable": "A",
-          "sargam": "P",
-          "bol": "/"
-        },
-        {
-          "syllable": "-",
-          "sargam": "m",
-          "bol": "-"
-        },
-        {
-          "syllable": "nan",
-          "sargam": "G",
-          "bol": "-"
-        },
-        {
-          "syllable": "-",
-          "sargam": "-",
-          "bol": "c"
-        },
-        {
-          "syllable": "di",
-          "sargam": "G",
-          "bol": "\\"
-        }
-      ],
-      "section": "sthayi"
-    }
-  ]
+  "taal": {
+    "slug": "chau",
+    "name": "Chau Taal",
+    "type": "taal",
+    "sections": [
+      {
+        "name": "sam",
+        "subsections": [
+          {
+            "type": "anga",
+            "matras": [
+              {
+                "syllable": "Dha"
+              },
+              {
+                "syllable": "Dha"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "bandish": {
+    "slug": "anandi-jagabandi",
+    "name": "Anandi Jagabandi",
+    "type": "bandish",
+    "sections": [
+      {
+        "name": "sthayi",
+        "subsections": [
+          {
+            "type": "line",
+            "matras": [
+              {
+                "syllable": "A",
+                "sargam": "P",
+                "bol": "/"
+              },
+              {
+                "syllable": "-",
+                "sargam": "m",
+                "bol": "-"
+              },
+              {
+                "syllable": "nan",
+                "sargam": "G",
+                "bol": "-"
+              },
+              {
+                "syllable": "-",
+                "sargam": "-",
+                "bol": "c"
+              },
+              {
+                "syllable": "di",
+                "sargam": "G",
+                "bol": "\\"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
 }
 
-function MatraItem({ lineNr, matraNr, itemType, value, onMatraInputChange }) {
+function MatraItem({ value, itemType, matraNr, subsectionNr, sectionName, sectionNr, onMatraInputChange }) {
   return (
-    <div className="matraitem">
+    <div className={itemType}>
       <div>{value}</div>
       <input
+        name={`${sectionName}-${subsectionNr}-${matraNr}-${itemType}`}
         value={value}
-        name={`${itemType}-${lineNr}-${matraNr}`}
         data-type={itemType}
-        data-matranr={matraNr}
+        data-matra-nr={matraNr}
+        data-subsection-nr={subsectionNr}
+        data-section-name={sectionName}
         onChange={onMatraInputChange}
       />
     </div>
   )
 }
 
-function Matra({ lineNr, matraNr, values, onMatraInputChange }) {
+function Matra({ matra, matraNr, subsectionNr, sectionName, sectionNr, onMatraInputChange }) {
   return (
     <div className="matra">
-      {Object.entries(values).map(([key, value]) => (
+      {Object.entries(matra).map(([key, value]) => (
         <MatraItem
-          lineNr={lineNr}
-          matraNr={matraNr}
           key={key}
-          itemType={key}
           value={value}
+          itemType={key}
+          matraNr={matraNr}
+          subsectionNr={subsectionNr}
+          sectionName={sectionName}
+          sectionNr={sectionNr}
           onMatraInputChange={onMatraInputChange}
         />
       ))}
@@ -71,39 +107,67 @@ function Matra({ lineNr, matraNr, values, onMatraInputChange }) {
   )
 }
 
-function Line({lineNr, matras, onMatraInputChange}) {
+function SubSection({ subsection, subsectionNr, sectionName, sectionNr, onMatraInputChange }) {
   return (
-    <div className="line">
-      {matras.map((values, i) => (
+    <div className={subsection.type}>
+      {subsection.matras.map((matra, i) => (
         <Matra
           key={i}
-          lineNr={lineNr}
+          matra={matra}
           matraNr={i}
-          values={values}
+          subsectionNr={subsectionNr}
+          sectionName={sectionName}
+          sectionNr={sectionNr}
           onMatraInputChange={onMatraInputChange}
         />
       ))}
     </div>
   )
+}
+
+function Section({ section, sectionNr, onMatraInputChange }) {
+  return (
+    <div className="section">
+      <h2>{section.name}</h2>
+      {section.subsections.map((subsection, i) => (
+        <SubSection
+          key={i}
+          subsection={subsection}
+          subsectionNr={i}
+          sectionName={section.name}
+          sectionNr={sectionNr}
+          onMatraInputChange={onMatraInputChange}
+        />
+      ))}
+    </div>
+  )  
 }
 
 function Composition() {
-  const [lines, setLines] = useState(testData.lines)
+  const [sections, setSections] = useState(testData.bandish.sections)
+  const [name, setName] = useState(testData.bandish.name)
 
-  function handleChange(itemType, value, matraNr, lineNr) {
-    const nextLines = lines.slice();
-    nextLines[lineNr].matras[matraNr][itemType] = value;
-    setLines(nextLines);
+  function handleChange(sectionNr, subsectionNr, matraNr, itemType, value) {
+    const nextSections = sections.slice();
+    nextSections[sectionNr].subsections[subsectionNr].matras[matraNr][itemType] = value;
+    setSections(nextSections);
   }
 
   return (
     <div className="composition">
-      {lines.map((line, i) => (
-        <Line
-          key={i}
-          lineNr={i}
-          matras={line.matras}
-          onMatraInputChange={e => handleChange(e.target.dataset.type, e.target.value, e.target.dataset.matranr, i)}
+      <h1>{name}</h1>
+      {sections.map((section, i) => (
+        <Section
+          key={section.name}
+          section={section}
+          sectionNr={i}
+          onMatraInputChange={e => handleChange(
+            i,
+            e.target.dataset.subsectionNr,
+            e.target.dataset.matraNr,
+            e.target.dataset.type,
+            e.target.value,
+          )}
         />
       ))}
     </div>

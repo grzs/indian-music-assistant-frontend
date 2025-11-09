@@ -1,36 +1,39 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
-const testData = {
-  "taal": {
-    "slug": "chau",
-    "name": "Chau Taal",
-    "type": "taal",
-    "sections": [
-      {
-        "name": "sam",
-        "subsections": [
-          {
-            "type": "anga",
-            "matras": [
-              {
-                "syllable": "Dha"
-              },
-              {
-                "syllable": "Dha"
-              }
-            ]
-          }
-        ]
-      }
-    ]
+const testAppState = {
+  "taals": {
+    "chau": {
+      "slug": "chau",
+      "name": "Chau Taal",
+      "type": "taal",
+      "sections": [
+        {
+          "name": "sam",
+          "subsections": [
+            {
+              "type": "anga",
+              "matras": [
+                {
+                  "syllable": "Dha"
+                },
+                {
+                  "syllable": "Dha"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
   },
   "bandish": {
     "slug": "anandi-jagabandi",
     "name": "Anandi Jagabandi",
     "type": "bandish",
+    "taal": "chau",
     "sections": [
       {
         "name": "sthayi",
@@ -82,15 +85,16 @@ function MatraItem({ value, itemType, matraNr, subsectionNr, sectionName, sectio
         data-matra-nr={matraNr}
         data-subsection-nr={subsectionNr}
         data-section-name={sectionName}
+        data-section-nr={sectionNr}
         onChange={onMatraInputChange}
       />
     </div>
   )
 }
 
-function Matra({ matra, matraNr, subsectionNr, sectionName, sectionNr, onMatraInputChange }) {
+function Matra({ matra, matraNr, subsectionNr, sectionName, sectionNr, isActive, activeMatra, onMatraInputChange }) {
   return (
-    <div className="matra">
+    <div className={isActive ? "matra active" : "matra"}>
       {Object.entries(matra).map(([key, value]) => (
         <MatraItem
           key={key}
@@ -107,9 +111,9 @@ function Matra({ matra, matraNr, subsectionNr, sectionName, sectionNr, onMatraIn
   )
 }
 
-function SubSection({ subsection, subsectionNr, sectionName, sectionNr, onMatraInputChange }) {
+function SubSection({ subsection, subsectionNr, sectionName, sectionNr, isActive, activeMatra, onMatraInputChange }) {
   return (
-    <div className={subsection.type}>
+    <div className={isActive ? `${subsection.type} active` : subsection.type}>
       {subsection.matras.map((matra, i) => (
         <Matra
           key={i}
@@ -118,6 +122,8 @@ function SubSection({ subsection, subsectionNr, sectionName, sectionNr, onMatraI
           subsectionNr={subsectionNr}
           sectionName={sectionName}
           sectionNr={sectionNr}
+          isActive={i == activeMatra["matra"]}
+          activeMatra={activeMatra}
           onMatraInputChange={onMatraInputChange}
         />
       ))}
@@ -125,9 +131,9 @@ function SubSection({ subsection, subsectionNr, sectionName, sectionNr, onMatraI
   )
 }
 
-function Section({ section, sectionNr, onMatraInputChange }) {
+function Section({ section, sectionNr, isActive, activeMatra, onMatraInputChange }) {
   return (
-    <div className="section">
+    <div className={isActive ? "section active" : "section"}>
       <h2>{section.name}</h2>
       {section.subsections.map((subsection, i) => (
         <SubSection
@@ -136,6 +142,8 @@ function Section({ section, sectionNr, onMatraInputChange }) {
           subsectionNr={i}
           sectionName={section.name}
           sectionNr={sectionNr}
+          isActive={i == activeMatra["subsection"]}
+          activeMatra={activeMatra}
           onMatraInputChange={onMatraInputChange}
         />
       ))}
@@ -143,31 +151,41 @@ function Section({ section, sectionNr, onMatraInputChange }) {
   )  
 }
 
-function Composition() {
-  const [sections, setSections] = useState(testData.bandish.sections)
-  const [name, setName] = useState(testData.bandish.name)
+function Composition({ sections, cursorPosition, onMatraInputChange }) {
+  const [activeMatra, setActiveMatra] = useState({"section": 0, "subsection": 0, "matra": 0})
 
-  function handleChange(sectionNr, subsectionNr, matraNr, itemType, value) {
-    const nextSections = sections.slice();
-    nextSections[sectionNr].subsections[subsectionNr].matras[matraNr][itemType] = value;
-    setSections(nextSections);
-  }
+  useEffect(() => {
+    const allMatras = sections.map(section => section.subsections.map(subsection => subsection.matras))
+    const compLength = allMatras.flat(2).length
+    const position = cursorPosition % compLength
+
+    const nextActiveMatra = {"section": 0, "subsection": 0, "matra": 0}
+
+    let i = 0
+    for (let sectionIdx in sections) {
+      nextActiveMatra.section = sectionIdx
+      for (let subsectionIdx in sections[sectionIdx].subsections) {
+        nextActiveMatra.subsection = subsectionIdx
+        for (let matraIdx in sections[sectionIdx].subsections[subsectionIdx].matras) {
+          nextActiveMatra.matra = matraIdx
+          if (i++ == position) break
+        }
+      }
+    }
+
+    setActiveMatra(nextActiveMatra)
+  }, [sections, cursorPosition])
 
   return (
     <div className="composition">
-      <h1>{name}</h1>
       {sections.map((section, i) => (
         <Section
           key={section.name}
           section={section}
           sectionNr={i}
-          onMatraInputChange={e => handleChange(
-            i,
-            e.target.dataset.subsectionNr,
-            e.target.dataset.matraNr,
-            e.target.dataset.type,
-            e.target.value,
-          )}
+          isActive={i == activeMatra["section"]}
+          activeMatra={activeMatra}
+          onMatraInputChange={onMatraInputChange}
         />
       ))}
     </div>
@@ -176,6 +194,30 @@ function Composition() {
 
 function App() {
   const [count, setCount] = useState(0)
+  const [taals, setTaals] = useState(testAppState.taals)
+  const [taal, setTaal] = useState({sections: []})
+  const [composition, setComposition] = useState({taal: "chau", sections: []})
+
+  useEffect(() => {
+    const nextTaal = {sections: taal.sections.slice()}
+    if (composition.taal) nextTaal.sections = taals[composition.taal].sections
+    setTaal(nextTaal)
+  }, [composition])
+
+  function handleMatraChange(dataset, value) {
+    const nextComposition = Object.assign({}, composition)
+    nextComposition.sections = composition.sections.slice() // still doesn't enough, preserves references
+    nextComposition
+      .sections[dataset.sectionNr]
+      .subsections[dataset.subsectionNr]
+      .matras[dataset.matraNr][dataset.type] = value;
+    setComposition(nextComposition)
+  }
+
+  function loadData() {
+    const nextComposition = JSON.parse(JSON.stringify(testAppState.bandish))
+    setComposition(nextComposition)
+  }
 
   return (
     <>
@@ -188,21 +230,29 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
-      <h1>Vite + React</h1>
+      */}
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+        <button onClick={loadData}>Load</button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-      */}
       <div>
-        <Composition />
+        <h1>{composition.name}</h1>
+        <div id="taal">
+          <Composition
+            sections={taal.sections}
+            cursorPosition={count}
+            onMatraInputChange={() => {console.log("Taal is not editable")}}
+          />
+        </div>
+        <div id="composition">
+          <Composition
+            sections={composition.sections}
+            cursorPosition={count}
+            onMatraInputChange={e => handleMatraChange(e.target.dataset, e.target.value)}
+          />
+        </div>
       </div>
     </>
   )

@@ -40,3 +40,31 @@
 .read-the-docs {
   color: #888;
 }
+
+.matra.active {
+    background-color: lightgray;
+}
+
+#taal input {
+    display: none;
+}
+
+#composition .number {
+    display: none;
+}
+
+#composition input {
+    display: none;
+}
+
+#composition.editing input {
+    display: unset;
+}
+
+#composition div.matraitem {
+    display: unset;
+}
+
+#composition.editing div.matraitem {
+    display: none;
+}

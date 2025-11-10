@@ -74,10 +74,20 @@ const testAppState = {
   }
 }
 
-function MatraItem({ value, itemType, matraNr, subsectionNr, sectionName, sectionNr, onMatraInputChange }) {
+function MatraItem({ value, itemType, matraNr, subsectionNr, sectionName, sectionNr, matraCounter, onMatraInputChange }) {
+  if (itemType == "number") {
+    return (
+      <div className={itemType} data-matra-nr-global={matraCounter}>{value}</div>
+    )
+  }
   return (
-    <div className={itemType}>
-      <div>{value}</div>
+    <div
+      className={itemType}
+      data-matra-nr-global={matraCounter}
+    >
+      <div className="matraitem" data-matra-nr-global={matraCounter}>
+        {value}
+      </div>
       <input
         name={`${sectionName}-${subsectionNr}-${matraNr}-${itemType}`}
         value={value}
@@ -92,18 +102,25 @@ function MatraItem({ value, itemType, matraNr, subsectionNr, sectionName, sectio
   )
 }
 
-function Matra({ matra, matraNr, subsectionNr, sectionName, sectionNr, isActive, activeMatra, onMatraInputChange }) {
+function Matra({ matra, matraNr, subsectionNr, sectionName, sectionNr, matraCounter, position, onMatraInputChange, onMatraSelect }) {
+  matra["number"] = matraCounter
   return (
-    <div className={isActive ? "matra active" : "matra"}>
+    <div
+      data-matra-nr-global={matraCounter}
+      onClick={onMatraSelect}
+      className={position == matraCounter ? "matra active" : "matra"}
+    >
       {Object.entries(matra).map(([key, value]) => (
         <MatraItem
           key={key}
           value={value}
           itemType={key}
+          matraNrGlobal={matraCounter}
           matraNr={matraNr}
           subsectionNr={subsectionNr}
           sectionName={sectionName}
           sectionNr={sectionNr}
+          matraCounter={matraCounter}
           onMatraInputChange={onMatraInputChange}
         />
       ))}
@@ -111,9 +128,9 @@ function Matra({ matra, matraNr, subsectionNr, sectionName, sectionNr, isActive,
   )
 }
 
-function SubSection({ subsection, subsectionNr, sectionName, sectionNr, isActive, activeMatra, onMatraInputChange }) {
+function SubSection({ subsection, subsectionNr, sectionName, sectionNr, matraCounter, position, onMatraInputChange, onMatraSelect }) {
   return (
-    <div className={isActive ? `${subsection.type} active` : subsection.type}>
+    <div className={position in matraCounter ? `${subsection.type} active` : subsection.type}>
       {subsection.matras.map((matra, i) => (
         <Matra
           key={i}
@@ -122,18 +139,19 @@ function SubSection({ subsection, subsectionNr, sectionName, sectionNr, isActive
           subsectionNr={subsectionNr}
           sectionName={sectionName}
           sectionNr={sectionNr}
-          isActive={i == activeMatra["matra"]}
-          activeMatra={activeMatra}
+          matraCounter={matraCounter[i]}
+          position={position}
           onMatraInputChange={onMatraInputChange}
+          onMatraSelect={onMatraSelect}
         />
       ))}
     </div>
   )
 }
 
-function Section({ section, sectionNr, isActive, activeMatra, onMatraInputChange }) {
+function Section({ section, sectionNr, matraCounter, position, onMatraInputChange, onMatraSelect }) {
   return (
-    <div className={isActive ? "section active" : "section"}>
+    <div className="section">
       <h2>{section.name}</h2>
       {section.subsections.map((subsection, i) => (
         <SubSection
@@ -142,38 +160,23 @@ function Section({ section, sectionNr, isActive, activeMatra, onMatraInputChange
           subsectionNr={i}
           sectionName={section.name}
           sectionNr={sectionNr}
-          isActive={i == activeMatra["subsection"]}
-          activeMatra={activeMatra}
+          matraCounter={matraCounter[i]}
+          position={position}
           onMatraInputChange={onMatraInputChange}
+          onMatraSelect={onMatraSelect}
         />
       ))}
     </div>
   )  
 }
 
-function Composition({ sections, cursorPosition, onMatraInputChange }) {
-  const [activeMatra, setActiveMatra] = useState({"section": 0, "subsection": 0, "matra": 0})
+function Composition({ sections, cursorPosition, matraCounter, onMatraInputChange, onMatraSelect }) {
+  const [position, setPosition] = useState(0)
 
   useEffect(() => {
-    const allMatras = sections.map(section => section.subsections.map(subsection => subsection.matras))
-    const compLength = allMatras.flat(2).length
-    const position = cursorPosition % compLength
-
-    const nextActiveMatra = {"section": 0, "subsection": 0, "matra": 0}
-
-    let i = 0
-    for (let sectionIdx in sections) {
-      nextActiveMatra.section = sectionIdx
-      for (let subsectionIdx in sections[sectionIdx].subsections) {
-        nextActiveMatra.subsection = subsectionIdx
-        for (let matraIdx in sections[sectionIdx].subsections[subsectionIdx].matras) {
-          nextActiveMatra.matra = matraIdx
-          if (i++ == position) break
-        }
-      }
-    }
-
-    setActiveMatra(nextActiveMatra)
+    const compLength = matraCounter.flat(2).length
+    const nextPosition = cursorPosition % compLength
+    setPosition(nextPosition)
   }, [sections, cursorPosition])
 
   return (
@@ -183,9 +186,10 @@ function Composition({ sections, cursorPosition, onMatraInputChange }) {
           key={section.name}
           section={section}
           sectionNr={i}
-          isActive={i == activeMatra["section"]}
-          activeMatra={activeMatra}
+          matraCounter={matraCounter[i]}
+          position={position}
           onMatraInputChange={onMatraInputChange}
+          onMatraSelect={onMatraSelect}
         />
       ))}
     </div>
@@ -197,6 +201,7 @@ function App() {
   const [taals, setTaals] = useState(testAppState.taals)
   const [taal, setTaal] = useState({sections: []})
   const [composition, setComposition] = useState({taal: "chau", sections: []})
+  const [editing, setEditing] = useState(false)
 
   useEffect(() => {
     const nextTaal = {sections: taal.sections.slice()}
@@ -204,14 +209,23 @@ function App() {
     setTaal(nextTaal)
   }, [composition])
 
-  function handleMatraChange(dataset, value) {
+  function getMatraCounter(sections) {
+    let counter = 0
+    return sections.map(
+      section => section.subsections.map(
+        subsection => subsection.matras.map(
+          (m, i) => counter++)))
+  }
+
+  function handleMatraChange(sectionNr, subsectionNr, matraNr, itemType, value) {
     const nextComposition = Object.assign({}, composition)
     nextComposition.sections = composition.sections.slice() // still doesn't enough, preserves references
-    nextComposition
-      .sections[dataset.sectionNr]
-      .subsections[dataset.subsectionNr]
-      .matras[dataset.matraNr][dataset.type] = value;
+    nextComposition.sections[sectionNr].subsections[subsectionNr].matras[matraNr][itemType] = value;
     setComposition(nextComposition)
+  }
+
+  function handleMatraSelect(position) {
+    if (position >= 0) setCount(Number(position))
   }
 
   function loadData() {
@@ -236,6 +250,9 @@ function App() {
           count is {count}
         </button>
         <button onClick={loadData}>Load</button>
+        <button onClick={() => setEditing((editing) => ! editing)}>
+          {editing ? "stop" : "start"} editing
+        </button>
       </div>
       <div>
         <h1>{composition.name}</h1>
@@ -243,14 +260,24 @@ function App() {
           <Composition
             sections={taal.sections}
             cursorPosition={count}
+            matraCounter={getMatraCounter(taal.sections)}
             onMatraInputChange={() => {console.log("Taal is not editable")}}
+            onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
           />
         </div>
-        <div id="composition">
+        <div id="composition" className={editing ? "editing" : ""}>
           <Composition
             sections={composition.sections}
             cursorPosition={count}
-            onMatraInputChange={e => handleMatraChange(e.target.dataset, e.target.value)}
+            matraCounter={getMatraCounter(composition.sections)}
+            onMatraInputChange={e => handleMatraChange(
+              e.target.dataset.sectionNr,
+              e.target.dataset.subsectionNr,
+              e.target.dataset.matraNr,
+              e.target.dataset.type,
+              e.target.value,
+            )}
+            onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
           />
         </div>
       </div>

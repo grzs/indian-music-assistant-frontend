@@ -202,6 +202,9 @@ function App() {
   const [taal, setTaal] = useState({sections: []})
   const [composition, setComposition] = useState({taal: "chau", sections: []})
   const [editing, setEditing] = useState(false)
+  const [playing, setPlaying] = useState(false)
+  const [bpm, setBpm] = useState(60)
+  const [loop, setLoop] = useState()
 
   useEffect(() => {
     const nextTaal = {sections: taal.sections.slice()}
@@ -215,6 +218,10 @@ function App() {
       section => section.subsections.map(
         subsection => subsection.matras.map(
           (m, i) => counter++)))
+  }
+
+  function incrementCount() {
+    setCount(count => count + 1)
   }
 
   function handleMatraChange(sectionNr, subsectionNr, matraNr, itemType, value) {
@@ -233,6 +240,21 @@ function App() {
     setComposition(nextComposition)
   }
 
+  function togglePlay() {
+    let interval = 60000 / bpm
+    let nextLoop = loop
+    
+    const nextPlaying = !playing
+    if (nextPlaying) nextLoop = setInterval(incrementCount, interval)
+    else {
+      clearInterval(loop)
+      nextLoop = undefined
+    }
+
+    setPlaying(nextPlaying)
+    setLoop(nextLoop)
+  }
+
   return (
     <>
       {/*
@@ -246,13 +268,14 @@ function App() {
       </div>
       */}
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={incrementCount}>
           count is {count}
         </button>
         <button onClick={loadData}>Load</button>
         <button onClick={() => setEditing((editing) => ! editing)}>
           {editing ? "stop" : "start"} editing
         </button>
+        <button onClick={togglePlay}>{playing ? "stop" : "play"}</button>
       </div>
       <div>
         <h1>{composition.name}</h1>

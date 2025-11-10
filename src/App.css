@@ -48,7 +48,9 @@
 }
 
 .composition .row h2 {
-    width: 100px;
+    width: 125px;
+    text-align: right;
+    padding-right: 8px;
 }
 
 #taal {
@@ -58,6 +60,12 @@
 #taal .composition, #taal .section, #taal .subsection {
     display: flex;
     flex-direction: row;
+}
+
+#composition .row h2 {
+    margin: 0;
+    padding-top: 8px;
+    border-bottom: 1px dotted black;
 }
 
 #composition .subsection.line {

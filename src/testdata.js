@@ -219,6 +219,76 @@ export default {
             ]
           }
         ]
+      },
+      {
+        "name": "sanchari",
+        "subsections": [
+          {
+            "type": "line",
+            "matras": [
+              {
+                "syllable": "A",
+                "sargam": "P",
+                "bol": "/"
+              },
+              {
+                "syllable": "-",
+                "sargam": "m",
+                "bol": "-"
+              },
+              {
+                "syllable": "nan",
+                "sargam": "G",
+                "bol": "-"
+              },
+              {
+                "syllable": "-",
+                "sargam": "-",
+                "bol": "c"
+              },
+              {
+                "syllable": "di",
+                "sargam": "G",
+                "bol": "\\"
+              },
+              {
+                "syllable": "-",
+                "sargam": "R",
+                "bol": "-"
+              },
+              {
+                "syllable": "Ja",
+                "sargam": "S",
+                "bol": "/"
+              },
+              {
+                "syllable": "ga",
+                "sargam": "N",
+                "bol": "/"
+              },
+              {
+                "syllable": "-",
+                "sargam": "D",
+                "bol": "-"
+              },
+              {
+                "syllable": "ban",
+                "sargam": "N",
+                "bol": "/"
+              },
+              {
+                "syllable": "-",
+                "sargam": "R",
+                "bol": "-"
+              },
+              {
+                "syllable": "di",
+                "sargam": "s",
+                "bol": "\\"
+              }
+            ]
+          }
+        ]
       }
     ]
   }

@@ -43,19 +43,26 @@ function Matra({
   matra["number"] = matraCounter + 1
 
   let classList = ["matra"]
-  if (matraNr == 0) classList.push(subsectionType)
+  if (matraNr == 0) {
+    classList.push(subsectionType)
+    if (subsectionType == "sam") matra["symbol"] = "+"
+    else if (subsectionType == "khali") matra["symbol"] = "0"
+    else if (subsectionType == "tali") matra["symbol"] = subsectionNr + 1
+  } else if (["sam", "tali", "khali"].includes(subsectionType)) matra["symbol"] = "\xa0"
+
   if (position == matraCounter) classList.push("active")
 
+  const keysOrdered = ["symbol", "syllable", "sargam", "bol", "number"]
   return (
     <div
       data-matra-nr-global={matraCounter}
       onClick={onMatraSelect}
       className={classList.join(" ")}
     >
-      {Object.entries(matra).map(([key, value]) => (
+      {keysOrdered.map(key => (
         <MatraItem
           key={key}
-          value={value}
+          value={matra[key]}
           itemType={key}
           matraNrGlobal={matraCounter}
           matraNr={matraNr}

@@ -1,5 +1,3 @@
-* TODO CSS layout
-* TODO theka anga signs
 * TODO editor
 ** TODO add/delete lines
 * TODO BPM changer
@@ -8,4 +6,6 @@
 * TODO BPM multipliers
 * TODO export/import
 * TODO save/load
+* DONE theka anga signs
 * DONE separate level for sections within compositions (sthayi, antara, etc)
+* DONE CSS base layout

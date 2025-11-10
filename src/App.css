@@ -41,8 +41,53 @@
   color: #888;
 }
 
+/* changes starts from here */
+.composition .row {
+    display: flex;
+    flex-direction: row;
+}
+
+.composition .row h2 {
+    width: 100px;
+}
+
+#taal {
+    border-bottom: 1px solid black;
+}
+
+#taal .composition, #taal .section, #taal .subsection {
+    display: flex;
+    flex-direction: row;
+}
+
+#composition .subsection.line {
+    display: flex;
+    flex-direction: row;
+    border-bottom: 1px dotted black;
+}
+
+.matra {
+    width: 60px;
+}
+
+.matra input {
+    width: 50px;
+}
+
 .matra.active {
     background-color: lightgray;
+}
+
+.matra.active.sam {
+    background-color: lightsalmon;
+}
+
+.matra.active.tali {
+    background-color: lightgreen;
+}
+
+.matra.active.khali {
+    background-color: lightblue;
 }
 
 #taal input {

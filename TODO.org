@@ -1,1 +1,11 @@
-* TODO separate level for sections within compositions (sthayi, antara, etc)
+* TODO CSS layout
+* TODO theka anga signs
+* TODO editor
+** TODO add/delete lines
+* TODO BPM changer
+* TODO loop range (dragstart/dragstop)
+* TODO transport panel
+* TODO BPM multipliers
+* TODO export/import
+* TODO save/load
+* DONE separate level for sections within compositions (sthayi, antara, etc)

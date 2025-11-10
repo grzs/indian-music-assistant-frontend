@@ -1,11 +1,12 @@
 * TODO editor
 ** TODO add/delete lines
 * TODO BPM changer
+* TODO sounds
 * TODO loop range (dragstart/dragstop)
 * TODO transport panel
 * TODO BPM multipliers
-* TODO export/import
 * TODO save/load
+* DONE export/import
 * DONE theka anga signs
 * DONE separate level for sections within compositions (sthayi, antara, etc)
 * DONE CSS base layout

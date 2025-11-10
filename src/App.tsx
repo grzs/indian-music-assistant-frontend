@@ -4,6 +4,7 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import { default as testAppState } from './testdata.js'
 import { Composition } from './Composition.tsx'
+import { importComposition, exportComposition } from './filesystem.js'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -81,6 +82,8 @@ function App() {
           count is {count}
         </button>
         <button onClick={loadData}>Load</button>
+        <button onClick={() => exportComposition(composition)}>export</button>
+        <button onClick={() => importComposition(setComposition)}>import</button>
         <button onClick={() => setEditing((editing) => ! editing)}>
           {editing ? "stop" : "start"} editing
         </button>

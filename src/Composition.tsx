@@ -122,14 +122,21 @@ function Section({ section, sectionNr, matraCounter, position, onMatraInputChang
   )  
 }
 
-function Composition({ sections, cursorPosition, matraCounter, onMatraInputChange, onMatraSelect }) {
+function Composition({ sections, playerPosition, matraCounter, playing, delay, onMatraInputChange, onMatraSelect }) {
   const [position, setPosition] = useState(0)
+  const [delayIdx, setDelayIdx] = useState(0)
 
   useEffect(() => {
     const compLength = matraCounter.flat(2).length
-    const nextPosition = cursorPosition % compLength
-    setPosition(nextPosition)
-  }, [sections, cursorPosition])
+    if (playing) {
+      if (delayIdx <= 0) setPosition(pos => pos < compLength - 1 ? pos + 1 : 0)
+      if (delay > 0)
+        if (delayIdx > 0) setDelayIdx(idx => idx - 1)
+        else setDelayIdx(delay)
+    } else {
+      setPosition(playerPosition % compLength)
+    }
+  }, [sections, playerPosition, delay])
 
   return (
     <div className="composition">

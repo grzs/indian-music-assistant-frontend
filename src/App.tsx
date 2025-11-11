@@ -7,7 +7,7 @@ import { Composition } from './Composition.tsx'
 import { importComposition, exportComposition } from './filesystem.js'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [position, setPosition] = useState(-1)
   const [taals, setTaals] = useState(testAppState.taals)
   const [taal, setTaal] = useState({sections: []})
   const [composition, setComposition] = useState({taal: "chau", sections: []})
@@ -15,12 +15,31 @@ function App() {
   const [playing, setPlaying] = useState(false)
   const [bpm, setBpm] = useState(60)
   const [loop, setLoop] = useState()
+  const [taalDelay, setTaalDelay] = useState(0)
+  const [compositionDelay, setCompositionDelay] = useState(1)
 
   useEffect(() => {
     const nextTaal = {sections: taal.sections.slice()}
     if (composition.taal) nextTaal.sections = taals[composition.taal].sections
     setTaal(nextTaal)
   }, [composition])
+
+  useEffect(() => {
+    const interval = 60000 / bpm
+    let nextLoop = loop
+    
+    if (playing) nextLoop = setInterval(
+      () => setPosition(position => Number(position) + 1),
+      interval,
+    )
+    else {
+      clearInterval(loop)
+      nextLoop = undefined
+    }
+
+    setLoop(nextLoop)
+    
+  }, [playing, bpm])
 
   function getMatraCounter(sections) {
     let counter = 0
@@ -30,10 +49,6 @@ function App() {
           (m, i) => counter++)))
   }
 
-  function incrementCount() {
-    setCount(count => count + 1)
-  }
-
   function handleMatraChange(sectionNr, subsectionNr, matraNr, itemType, value) {
     const nextComposition = Object.assign({}, composition)
     nextComposition.sections = composition.sections.slice() // still doesn't enough, preserves references
@@ -41,28 +56,14 @@ function App() {
     setComposition(nextComposition)
   }
 
-  function handleMatraSelect(position) {
-    if (position >= 0) setCount(Number(position))
+  function handleMatraSelect(newPosition) {
+    if (newPosition >= 0 && !playing) setPosition(Number(newPosition))
   }
 
   function loadData() {
+    // TODO: implement this function
     const nextComposition = JSON.parse(JSON.stringify(testAppState.bandish))
     setComposition(nextComposition)
-  }
-
-  function togglePlay() {
-    let interval = 60000 / bpm
-    let nextLoop = loop
-    
-    const nextPlaying = !playing
-    if (nextPlaying) nextLoop = setInterval(incrementCount, interval)
-    else {
-      clearInterval(loop)
-      nextLoop = undefined
-    }
-
-    setPlaying(nextPlaying)
-    setLoop(nextLoop)
   }
 
   return (
@@ -78,24 +79,25 @@ function App() {
       </div>
       */}
       <div className="card">
-        <button onClick={incrementCount}>
-          count is {count}
-        </button>
-        <button onClick={loadData}>Load</button>
+        <button onClick={loadData}>load</button>
         <button onClick={() => exportComposition(composition)}>export</button>
         <button onClick={() => importComposition(setComposition)}>import</button>
         <button onClick={() => setEditing((editing) => ! editing)}>
           {editing ? "stop" : "start"} editing
         </button>
-        <button onClick={togglePlay}>{playing ? "stop" : "play"}</button>
+        <button onClick={() => setPlaying(playing => !playing)}>{playing ? "stop" : "play"}</button>
+        <button onClick={() => {if (!playing) setPosition(-1)}}>rewind</button>
       </div>
+      <div id="counter">player position: {position}</div>
       <div>
         <h1>{composition.name}</h1>
         <div id="taal">
           <Composition
             sections={taal.sections}
-            cursorPosition={count}
+            playerPosition={position}
             matraCounter={getMatraCounter(taal.sections)}
+            playing={playing}
+            delay={taalDelay}
             onMatraInputChange={() => {console.log("Taal is not editable")}}
             onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
           />
@@ -103,8 +105,10 @@ function App() {
         <div id="composition" className={editing ? "editing" : ""}>
           <Composition
             sections={composition.sections}
-            cursorPosition={count}
+            playerPosition={position}
             matraCounter={getMatraCounter(composition.sections)}
+            playing={playing}
+            delay={compositionDelay}
             onMatraInputChange={e => handleMatraChange(
               e.target.dataset.sectionNr,
               e.target.dataset.subsectionNr,

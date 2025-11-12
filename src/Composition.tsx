@@ -37,8 +37,10 @@ function Matra({
 
   // render items in order
   const keysOrdered = ["syllable", "sargam", "bol"]
+
+  // every DIV has data-matra-nr-global attribute, because all of them can receive click, that bubbles
   return (
-    <div data-matra-nr-global={matraNrGlobal} onClick={onMatraSelect} className={classList.join(" ")}>
+    <div data-matra-nr-global={matraNrGlobal} className={classList.join(" ") onClick={onMatraSelect}}>
       <div className="matraitem" data-matra-nr-global={matraNrGlobal}>
         <div className="symbol" data-matra-nr-global={matraNrGlobal}>
           {symbol}

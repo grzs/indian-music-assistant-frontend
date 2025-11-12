@@ -1,10 +1,12 @@
 * TODO save/load
-* TODO sounds
 * TODO editor
 ** TODO add/delete lines
 * TODO transport panel
 ** TODO BPM multipliers
 ** TODO BPM changer
+* TODO sounds
+** TODO on/off
+** TODO sound list of mantra
 * TODO loop range (dragstart/dragstop)
 * DONE export/import
 * DONE theka anga signs

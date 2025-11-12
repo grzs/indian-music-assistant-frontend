@@ -40,7 +40,7 @@ function getActiveMatra(angas, position, division) {
   return {}
 }
 
-function Taal({angas, division, taalLength, globalPosition, playing}) {
+function Taal({angas, division, taalLength, globalPosition, playing, onMatraSelect}) {
   const [position, setPosition] = useState(0)
   const [activeMatra, setActiveMatra] = useState({syllable: ""})
   const muteAll = useContext(SoundsContextMuteAll)
@@ -71,24 +71,32 @@ function Taal({angas, division, taalLength, globalPosition, playing}) {
           <div className="anga" key={angaIdx}>
             {anga.matras.map((matra, matraIdx) => (
               <div className="matradiv" key={matraIdx}>
-                <div className="symbol">{getMatraSymbol(anga.type, angaIdx, matraIdx)}</div>
                 <div
-                  className={getMatraClass(anga.type, matraIdx, position, division, matraCounter++)}
+                  className={getMatraClass(anga.type, matraIdx, position, division, matraCounter)}
                   data-matra-nr={matraCounter}
+                  onClick={onMatraSelect}
                 >
-                  <div className="syllable">{matra.syllable}</div>
-                  <div className="number">{matraCounter}</div>
+                  <div className="symbol" data-matra-nr={matraCounter}>
+                    {getMatraSymbol(anga.type, angaIdx, matraIdx)}
+                  </div>
+                  <div className="syllable" data-matra-nr={matraCounter}>
+                    {matra.syllable}
+                  </div>
+                  <div className="number" data-matra-nr={matraCounter}>
+                    {matraCounter + 1}
+                  </div>
                 </div>
                 <div className="beats">
                   {[...Array(Number(division)).keys()].map((beatIdx) => (
                     <div
-                      className={getBeatClass(position,beatCounter++)}
+                      className={getBeatClass(position, beatCounter)}
                       key={beatIdx}
                       data-nr={beatIdx}
                       data-matra-nr={matraCounter}
-                      data-beat-nr={beatCounter} />
+                      data-beat-nr={beatCounter++} />
                   ))}
                 </div>
+                <div hidden data-matra-nr={matraCounter++} />
               </div>
             ))}
           </div>

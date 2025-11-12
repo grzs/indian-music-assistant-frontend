@@ -9,20 +9,9 @@ import './App.css'
 import { default as testAppState } from './testdata.js'
 
 import { Taal } from './Taal.tsx'
-import { CompositionContext, Composition } from './Composition.tsx'
+import { Composition } from './Composition.tsx'
 
 import { importComposition, exportComposition } from './filesystem.js'
-
-function sections2array(sections) {
-  let counter = 0
-  return sections.map(
-    (section) => section.subsections.map(
-      (subsection) => subsection.matras.map(
-        (matra) => Object({nr: counter++, type: subsection.type, data: matra})
-      )
-    )
-  )
-}
 
 function getMatrasFlattened(angas) {
   return angas.map(anga => anga.matras.map(matra => matra)).flat(2)
@@ -40,7 +29,7 @@ function App() {
   const [position, setPosition] = useState(-1)
   const [taals, setTaals] = useState(testAppState.taals)
   const [taal, setTaal] = useState({angas: []})
-  const [composition, setComposition] = useState({taal: "chau", sections: []}) // TODO: only in DEV
+  const [composition, setComposition] = useState({taal: "chau", lines: []}) // TODO: only in DEV
   const [editing, setEditing] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [bpm, setBpm] = useState(60)
@@ -87,7 +76,8 @@ function App() {
     setComposition(nextComposition)
   }
 
-  function handleMatraSelect(newPosition) {
+  function handleMatraSelect(matraPosition) {
+    const newPosition = matraPosition * division
     if (newPosition >= 0 && !playing) setPosition(Number(newPosition))
   }
 
@@ -131,25 +121,25 @@ function App() {
               taalLength={taalLength}
               globalPosition={position}
               playing={playing}
+              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNr)}
             />
           </div>
           <div id="composition" className={editing ? "editing" : ""}>
-            <CompositionContext value={sections2array(composition.sections)}>
-              <Composition
-                sections={composition.sections}
-                playerPosition={position}
-                playing={playing}
-                delay={compositionDelay}
-                onMatraInputChange={e => handleMatraChange(
-                  e.target.dataset.sectionNr,
-                  e.target.dataset.subsectionNr,
-                  e.target.dataset.matraNr,
-                  e.target.dataset.type,
-                  e.target.value,
-                )}
-                onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
-              />
-            </CompositionContext>
+            <Composition
+              lines={composition.lines}
+              division={division}
+              taalLength={taalLength}
+              globalPosition={position}
+              playing={playing}
+              onMatraInputChange={e => handleMatraChange(
+                e.target.dataset.sectionNr,
+                e.target.dataset.subsectionNr,
+                e.target.dataset.matraNr,
+                e.target.dataset.type,
+                e.target.value,
+              )}
+              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
+            />
           </div>
         </div>
       </SoundsContextMuteAll>

@@ -102,7 +102,7 @@
     display: none;
 }
 
-#composition .number {
+#composition .symbol, #composition .number {
     display: none;
 }
 

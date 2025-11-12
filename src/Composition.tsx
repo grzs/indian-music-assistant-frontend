@@ -40,7 +40,7 @@ function Matra({
 
   // every DIV has data-matra-nr-global attribute, because all of them can receive click, that bubbles
   return (
-    <div data-matra-nr-global={matraNrGlobal} className={classList.join(" ") onClick={onMatraSelect}}>
+    <div data-matra-nr-global={matraNrGlobal} className={classList.join(" ")} onClick={onMatraSelect}>
       <div className="matraitem" data-matra-nr-global={matraNrGlobal}>
         <div className="symbol" data-matra-nr-global={matraNrGlobal}>
           {symbol}

@@ -4,75 +4,70 @@ export default {
       "slug": "chau",
       "name": "Chau Taal",
       "type": "taal",
-      "sections": [
+      "angas": [
         {
-          "name": "theka",
-          "subsections": [
+          "type": "sam",
+          "matras": [
             {
-              "type": "sam",
-              "matras": [
-                {
-                  "syllable": "Dha"
-                },
-                {
-                  "syllable": "Dha"
-                }
-              ]
+              "syllable": "Dha"
             },
             {
-              "type": "khali",
-              "matras": [
-                {
-                  "syllable": "Dhin"
-                },
-                {
-                  "syllable": "Ta"
-                }
-              ]
+              "syllable": "Dha"
+            }
+          ]
+        },
+        {
+          "type": "khali",
+          "matras": [
+            {
+              "syllable": "Dhin"
             },
             {
-              "type": "tali",
-              "matras": [
-                {
-                  "syllable": "Kite"
-                },
-                {
-                  "syllable": "Dha"
-                }
-              ]
+              "syllable": "Ta"
+            }
+          ]
+        },
+        {
+          "type": "tali",
+          "matras": [
+            {
+              "syllable": "Kite"
             },
             {
-              "type": "khali",
-              "matras": [
-                {
-                  "syllable": "Dhin"
-                },
-                {
-                  "syllable": "Ta"
-                }
-              ]
+              "syllable": "Dha"
+            }
+          ]
+        },
+        {
+          "type": "khali",
+          "matras": [
+            {
+              "syllable": "Dhin"
             },
             {
-              "type": "tali",
-              "matras": [
-                {
-                  "syllable": "Tite"
-                },
-                {
-                  "syllable": "Kate"
-                }
-              ]
+              "syllable": "Ta"
+            }
+          ]
+        },
+        {
+          "type": "tali",
+          "matras": [
+            {
+              "syllable": "Tite"
             },
             {
-              "type": "tali",
-              "matras": [
-                {
-                  "syllable": "Ghade"
-                },
-                {
-                  "syllable": "Ghana"
-                }
-              ]
+              "syllable": "Kate"
+            }
+          ]
+        },
+        {
+          "type": "tali",
+          "matras": [
+            {
+              "syllable": "Ghade"
+            },
+            {
+              "syllable": "Ghana"
             }
           ]
         }

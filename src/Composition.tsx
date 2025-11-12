@@ -89,12 +89,6 @@ function Composition({ sections, playerPosition, playing, delay, onMatraInputCha
     }
   }, [sections, playerPosition, delay])
 
-  useEffect(() => {
-    // TODO: it should be somewhere else, before any rendering ?
-    // TODO: there should be a list of sounds to be played at a matra
-    if (playing && position == 0) triggerSound("sam")
-  }, [position])
-
   return (
     <div className="composition">
       <PositionContext value={position}>

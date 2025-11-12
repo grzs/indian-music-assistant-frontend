@@ -1,6 +1,9 @@
+import { createContext } from 'react'
 import click from './assets/sounds/click.ogg'
 import clap from './assets/sounds/clap.ogg'
 import chime from './assets/sounds/chime.ogg'
+
+const SoundsContextMuteAll = createContext(true)
 
 const sounds = {
   click: new Audio(click),
@@ -17,4 +20,4 @@ function triggerSound(key) {
   else audioObj.currentTime = 0;
 }
 
-export { triggerSound }
+export { triggerSound, SoundsContextMuteAll }

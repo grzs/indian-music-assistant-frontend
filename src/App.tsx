@@ -1,10 +1,16 @@
 import { useState, useEffect } from 'react'
+
 // import viteLogo from '/vite.svg'
-import { triggerSound } from './sounds.js'
+
+import { SoundsContextMuteAll } from './sounds.js'
+
 import './App.css'
+
 import { default as testAppState } from './testdata.js'
+
 import { Taal } from './Taal.tsx'
 import { CompositionContext, Composition } from './Composition.tsx'
+
 import { importComposition, exportComposition } from './filesystem.js'
 
 function sections2array(sections) {
@@ -43,6 +49,7 @@ function App() {
   const [compositionDelay, setCompositionDelay] = useState(1)
   const [taalLength, setTaalLength] = useState(0)
   const [division, setDivision] = useState(2)
+  const [muteAll, setMuteAll] = useState(true)
 
   useEffect(() => {
     const matrasFlattened = getMatrasFlattened(taal.angas)
@@ -71,7 +78,6 @@ function App() {
 
   function triggerStep() {
     setPosition(position => Number(position) + 1)
-    triggerSound("click")
   }
 
   function handleMatraChange(sectionNr, subsectionNr, matraNr, itemType, value) {
@@ -112,32 +118,41 @@ function App() {
         </button>
         <button onClick={() => setPlaying(playing => !playing)}>{playing ? "stop" : "play"}</button>
         <button onClick={() => {if (!playing) setPosition(-1)}}>rewind</button>
+        <button onClick={() => setMuteAll(mute => !mute)}>{muteAll ? "sound" : "mute"}</button>
       </div>
       <div id="counter">player position: {position}</div>
-      <div id="main">
-        <h1>{composition.name}</h1>
-        <div id="taal">
-          <Taal angas={taal.angas} division={division} taalLength={taalLength} globalPosition={position}/>
-        </div>
-        <div id="composition" className={editing ? "editing" : ""}>
-          <CompositionContext value={sections2array(composition.sections)}>
-            <Composition
-              sections={composition.sections}
-              playerPosition={position}
+      <SoundsContextMuteAll value={muteAll}>
+        <div id="main">
+          <h1>{composition.name}</h1>
+          <div id="taal">
+            <Taal
+              angas={taal.angas}
+              division={division}
+              taalLength={taalLength}
+              globalPosition={position}
               playing={playing}
-              delay={compositionDelay}
-              onMatraInputChange={e => handleMatraChange(
-                e.target.dataset.sectionNr,
-                e.target.dataset.subsectionNr,
-                e.target.dataset.matraNr,
-                e.target.dataset.type,
-                e.target.value,
-              )}
-              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
             />
-          </CompositionContext>
+          </div>
+          <div id="composition" className={editing ? "editing" : ""}>
+            <CompositionContext value={sections2array(composition.sections)}>
+              <Composition
+                sections={composition.sections}
+                playerPosition={position}
+                playing={playing}
+                delay={compositionDelay}
+                onMatraInputChange={e => handleMatraChange(
+                  e.target.dataset.sectionNr,
+                  e.target.dataset.subsectionNr,
+                  e.target.dataset.matraNr,
+                  e.target.dataset.type,
+                  e.target.value,
+                )}
+                onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
+              />
+            </CompositionContext>
+          </div>
         </div>
-      </div>
+      </SoundsContextMuteAll>
     </>
   )
 }

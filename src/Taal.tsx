@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { triggerSound } from './sounds.js'
+import { useState, useEffect, useContext } from 'react'
+import { triggerSound, SoundsContextMuteAll } from './sounds'
 
 function getMatraSymbol(angaType, angaNr, matraNr) {
   let symbol = "\xa0"
@@ -25,12 +25,22 @@ function getBeatClass(position, beatIdx) {
   return classlist.join(" ")
 }
 
-function Taal({angas, division, taalLength, globalPosition}) {
+function Taal({angas, division, taalLength, globalPosition, playing}) {
   const [position, setPosition] = useState(0)
+  const muteAll = useContext(SoundsContextMuteAll)
 
   useEffect(() => {
     setPosition(globalPosition % (taalLength * division))
   }, [taalLength, globalPosition])
+
+  useEffect(() => {
+    // TODO: it should be somewhere else, before any rendering ?
+    // TODO: there should be a list of sounds to be played at a matra
+    if (!muteAll && playing) {
+      if (position == 0) triggerSound("sam")
+      else triggerSound("click")
+    }
+  }, [position])
 
   let matraCounter = 0
   let beatCounter = 0

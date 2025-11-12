@@ -1,10 +1,21 @@
 import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+// import viteLogo from '/vite.svg'
+import { triggerSound } from './sounds.js'
 import './App.css'
 import { default as testAppState } from './testdata.js'
-import { Composition } from './Composition.tsx'
+import { CompositionContext, Composition } from './Composition.tsx'
 import { importComposition, exportComposition } from './filesystem.js'
+
+function sections2array(sections) {
+  let counter = 0
+  return sections.map(
+    (section) => section.subsections.map(
+      (subsection) => subsection.matras.map(
+        (matra) => Object({nr: counter++, type: subsection.type, data: matra})
+      )
+    )
+  )
+}
 
 function App() {
   const [position, setPosition] = useState(-1)
@@ -27,26 +38,20 @@ function App() {
   useEffect(() => {
     const interval = 60000 / bpm
     let nextLoop = loop
-    
-    if (playing) nextLoop = setInterval(
-      () => setPosition(position => Number(position) + 1),
-      interval,
-    )
+
+    if (playing) nextLoop = setInterval(triggerStep, interval)
     else {
       clearInterval(loop)
       nextLoop = undefined
     }
 
     setLoop(nextLoop)
-    
+
   }, [playing, bpm])
 
-  function getMatraCounter(sections) {
-    let counter = 0
-    return sections.map(
-      section => section.subsections.map(
-        subsection => subsection.matras.map(
-          (m, i) => counter++)))
+  function triggerStep() {
+    setPosition(position => Number(position) + 1)
+    triggerSound("click")
   }
 
   function handleMatraChange(sectionNr, subsectionNr, matraNr, itemType, value) {
@@ -73,9 +78,6 @@ function App() {
         <a href="https://vite.dev" target="_blank">
           <img src={viteLogo} className="logo" alt="Vite logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
       </div>
       */}
       <div className="card">
@@ -92,32 +94,34 @@ function App() {
       <div>
         <h1>{composition.name}</h1>
         <div id="taal">
-          <Composition
-            sections={taal.sections}
-            playerPosition={position}
-            matraCounter={getMatraCounter(taal.sections)}
-            playing={playing}
-            delay={taalDelay}
-            onMatraInputChange={() => {console.log("Taal is not editable")}}
-            onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
-          />
+          <CompositionContext value={sections2array(taal.sections)}>
+            <Composition
+              sections={taal.sections}
+              playerPosition={position}
+              playing={playing}
+              delay={taalDelay}
+              onMatraInputChange={() => {console.log("Taal is not editable")}}
+              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
+            />
+          </CompositionContext>
         </div>
         <div id="composition" className={editing ? "editing" : ""}>
-          <Composition
-            sections={composition.sections}
-            playerPosition={position}
-            matraCounter={getMatraCounter(composition.sections)}
-            playing={playing}
-            delay={compositionDelay}
-            onMatraInputChange={e => handleMatraChange(
-              e.target.dataset.sectionNr,
-              e.target.dataset.subsectionNr,
-              e.target.dataset.matraNr,
-              e.target.dataset.type,
-              e.target.value,
-            )}
-            onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
-          />
+          <CompositionContext value={sections2array(composition.sections)}>
+            <Composition
+              sections={composition.sections}
+              playerPosition={position}
+              playing={playing}
+              delay={compositionDelay}
+              onMatraInputChange={e => handleMatraChange(
+                e.target.dataset.sectionNr,
+                e.target.dataset.subsectionNr,
+                e.target.dataset.matraNr,
+                e.target.dataset.type,
+                e.target.value,
+              )}
+              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
+            />
+          </CompositionContext>
         </div>
       </div>
     </>

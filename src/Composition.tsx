@@ -1,96 +1,94 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, createContext, useContext } from 'react'
+import { triggerSound } from './sounds.js'
 
-function MatraItem({ value, itemType, matraNr, subsectionNr, sectionName, sectionNr, matraCounter, onMatraInputChange }) {
+const PositionContext = createContext(0)
+const CompositionContext = createContext([])
+const SectionContext = createContext({nr: 0, name: ""})
+const SubSectionContext = createContext({nr: 0, type: ""})
+
+function MatraItem({ value, itemType, matraNr, matraNrGlobal, onMatraInputChange }) {
+  const section = useContext(SectionContext)
+  const subsection = useContext(SubSectionContext)
+
   if (itemType == "number") {
     return (
-      <div className={itemType} data-matra-nr-global={matraCounter}>{value}</div>
+      <div className={itemType} data-matra-nr-global={matraNrGlobal}>{matraNrGlobal + 1}</div>
     )
   }
   return (
     <div
       className={itemType}
-      data-matra-nr-global={matraCounter}
+      data-matra-nr-global={matraNrGlobal}
     >
-      <div className="matraitem" data-matra-nr-global={matraCounter}>
+      <div className="matraitem" data-matra-nr-global={matraNrGlobal}>
         {value}
       </div>
       <input
-        name={`${sectionName}-${subsectionNr}-${matraNr}-${itemType}`}
+        name={`${section.name}-${subsection.nr}-${matraNr}-${itemType}`}
         value={value}
         data-type={itemType}
         data-matra-nr={matraNr}
-        data-subsection-nr={subsectionNr}
-        data-section-name={sectionName}
-        data-section-nr={sectionNr}
+        data-subsection-nr={subsection.nr}
+        data-section-name={section.name}
+        data-section-nr={section.nr}
         onChange={onMatraInputChange}
       />
     </div>
   )
 }
 
-function Matra({
-  matra,
-  matraNr,
-  subsectionNr,
-  subsectionType,
-  sectionName,
-  sectionNr,
-  matraCounter,
-  position,
-  onMatraInputChange,
-  onMatraSelect
-}) {
-  matra["number"] = matraCounter + 1
+function Matra({matra, matraNr, onMatraInputChange, onMatraSelect}) {
+  const section = useContext(SectionContext)
+  const subsection = useContext(SubSectionContext)
+  const position = useContext(PositionContext)
+  const compositionCtx = useContext(CompositionContext)
+  const matraCtx = compositionCtx[section.nr][subsection.nr][matraNr]
 
   let classList = ["matra"]
-  if (matraNr == 0) {
-    classList.push(subsectionType)
-    if (subsectionType == "sam") matra["symbol"] = "+"
-    else if (subsectionType == "khali") matra["symbol"] = "0"
-    else if (subsectionType == "tali") matra["symbol"] = subsectionNr + 1
-  } else if (["sam", "tali", "khali"].includes(subsectionType)) matra["symbol"] = "\xa0"
+  let symbol
+  if (["sam", "tali", "khali"].includes(subsection.type)) {
+    symbol = "\xa0"
+    if (matraNr == 0) {
+      classList.push(subsection.type)
+      if (subsection.type == "sam") symbol = "+"
+      else if (subsection.type == "khali") symbol = "0"
+      else if (subsection.type == "tali") symbol = subsection.nr + 1
+    }
+  }
 
-  if (position == matraCounter) classList.push("active")
+  if (position == matraCtx.nr) classList.push("active")
 
-  const keysOrdered = ["symbol", "syllable", "sargam", "bol", "number"]
+  const keysOrdered = ["syllable", "sargam", "bol"]
   return (
     <div
-      data-matra-nr-global={matraCounter}
+      data-matra-nr-global={matraCtx.nr}
       onClick={onMatraSelect}
       className={classList.join(" ")}
     >
+      {symbol != undefined && <MatraItem value={symbol} itemType="symbol" />}
       {keysOrdered.map(key => (
         <MatraItem
           key={key}
           value={matra[key]}
           itemType={key}
-          matraNrGlobal={matraCounter}
           matraNr={matraNr}
-          subsectionNr={subsectionNr}
-          sectionName={sectionName}
-          sectionNr={sectionNr}
-          matraCounter={matraCounter}
+          matraNrGlobal={matraCtx.nr}
           onMatraInputChange={onMatraInputChange}
         />
       ))}
+      <MatraItem value={matraCtx.nr} itemType="number" matraNrGlobal={matraCtx.nr} />
     </div>
   )
 }
 
-function SubSection({ subsection, subsectionNr, sectionName, sectionNr, matraCounter, position, onMatraInputChange, onMatraSelect }) {
+function SubSection({ subsection, onMatraInputChange, onMatraSelect }) {
   return (
-    <div className={position in matraCounter ? `subsection ${subsection.type} active` : `subsection ${subsection.type}`}>
+    <div className={`subsection ${subsection.type}`}>
       {subsection.matras.map((matra, i) => (
         <Matra
           key={i}
           matra={matra}
           matraNr={i}
-          subsectionNr={subsectionNr}
-          subsectionType={subsection.type}
-          sectionName={sectionName}
-          sectionNr={sectionNr}
-          matraCounter={matraCounter[i]}
-          position={position}
           onMatraInputChange={onMatraInputChange}
           onMatraSelect={onMatraSelect}
         />
@@ -99,60 +97,63 @@ function SubSection({ subsection, subsectionNr, sectionName, sectionNr, matraCou
   )
 }
 
-function Section({ section, sectionNr, matraCounter, position, onMatraInputChange, onMatraSelect }) {
+function Section({ section, onMatraInputChange, onMatraSelect }) {
   return (
     <div className="row">
       <h2>{section.name}</h2>
       <div className="section">
         {section.subsections.map((subsection, i) => (
-          <SubSection
-            key={i}
-            subsection={subsection}
-            subsectionNr={i}
-            sectionName={section.name}
-            sectionNr={sectionNr}
-            matraCounter={matraCounter[i]}
-            position={position}
-            onMatraInputChange={onMatraInputChange}
-            onMatraSelect={onMatraSelect}
-          />
+          <SubSectionContext key={i} value={{nr: i, type: subsection.type}}>
+            <SubSection
+              key={i}
+              subsection={subsection}
+              onMatraInputChange={onMatraInputChange}
+              onMatraSelect={onMatraSelect}
+            />
+          </SubSectionContext>
         ))}
       </div>
     </div>
   )  
 }
 
-function Composition({ sections, playerPosition, matraCounter, playing, delay, onMatraInputChange, onMatraSelect }) {
+function Composition({ sections, playerPosition, playing, delay, onMatraInputChange, onMatraSelect }) {
   const [position, setPosition] = useState(0)
   const [delayIdx, setDelayIdx] = useState(0)
+  const compositionCtx = useContext(CompositionContext)
 
   useEffect(() => {
-    const compLength = matraCounter.flat(2).length
+    const cLength = compositionCtx.flat(2).length
     if (playing) {
-      if (delayIdx <= 0) setPosition(pos => pos < compLength - 1 ? pos + 1 : 0)
+      if (delayIdx <= 0) setPosition(pos => pos < cLength - 1 ? pos + 1 : 0)
       if (delay > 0)
         if (delayIdx > 0) setDelayIdx(idx => idx - 1)
         else setDelayIdx(delay)
     } else {
-      setPosition(playerPosition % compLength)
+      setPosition(playerPosition % cLength)
     }
   }, [sections, playerPosition, delay])
 
+  useEffect(() => {
+    if (playing && position == 0) triggerSound("chime")
+  }, [position])
+
   return (
     <div className="composition">
-      {sections.map((section, i) => (
-        <Section
-          key={section.name}
-          section={section}
-          sectionNr={i}
-          matraCounter={matraCounter[i]}
-          position={position}
-          onMatraInputChange={onMatraInputChange}
-          onMatraSelect={onMatraSelect}
-        />
-      ))}
+      <PositionContext value={position}>
+        {sections.map((section, i) => (
+          <SectionContext key={i} value={{nr: i, name: section.name}}>
+            <Section
+              key={section.name}
+              section={section}
+              onMatraInputChange={onMatraInputChange}
+              onMatraSelect={onMatraSelect}
+            />
+          </SectionContext>
+        ))}
+      </PositionContext>
     </div>
   )
 }
 
-export { Composition }
+export { CompositionContext, Composition }

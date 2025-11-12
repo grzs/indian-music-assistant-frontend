@@ -12,6 +12,7 @@ import { Taal } from './Taal.tsx'
 import { Composition } from './Composition.tsx'
 
 import { importComposition, exportComposition } from './filesystem.js'
+import { APIClient } from './apiClient.tsx'
 
 function getMatrasFlattened(angas) {
   return angas.map(anga => anga.matras.map(matra => matra)).flat(2)
@@ -35,11 +36,10 @@ function App() {
   const [playing, setPlaying] = useState(false)
   const [bpm, setBpm] = useState(60)
   const [loop, setLoop] = useState()
-  const [taalDelay, setTaalDelay] = useState(0)
-  const [compositionDelay, setCompositionDelay] = useState(1)
   const [taalLength, setTaalLength] = useState(0)
   const [division, setDivision] = useState(1)
   const [muteAll, setMuteAll] = useState(true)
+  const [browserHidden, setBrowserHidden] = useState(true)
 
   useEffect(() => {
     const matrasFlattened = getMatrasFlattened(taal.angas)
@@ -50,6 +50,7 @@ function App() {
     const nextTaal = {angas: taal.angas.slice()}
     if (composition.taal) nextTaal.angas = taals[composition.taal].angas
     setTaal(nextTaal)
+    setBrowserHidden(true)
   }, [composition])
 
   useEffect(() => {
@@ -70,6 +71,10 @@ function App() {
     setPosition(position => Number(position) + 1)
   }
 
+  function showHideBrowser() {
+    setBrowserHidden(!browserHidden)
+  }
+
   function handleMatraChange(sectionNr, subsectionNr, matraNr, itemType, value) {
     const nextComposition = Object.assign({}, composition)
     nextComposition.sections = composition.sections.slice() // still doesn't enough, preserves references
@@ -82,7 +87,7 @@ function App() {
     if (newPosition >= 0) setPosition(Number(newPosition))
   }
 
-  function loadData() {
+  function loadTestData() {
     // TODO: implement this function
     const nextComposition = JSON.parse(JSON.stringify(testAppState.bandish))
     setComposition(nextComposition)
@@ -101,18 +106,18 @@ function App() {
       </div>
       */}
       <div className="card">
-        <button disabled={playing} onClick={loadData}>load</button>
+        <button disabled={playing} onClick={showHideBrowser}>{browserHidden ? "open" : "close"} browser</button>
         <button disabled={playing} onClick={() => exportComposition(composition)}>export</button>
         <button disabled={playing} onClick={() => importComposition(setComposition)}>import</button>
         <button disabled={playing} onClick={() => setEditing((editing) => ! editing)}>
           {editing ? "stop" : "start"} editing
         </button>
+        <button onClick={() => setMuteAll(mute => !mute)}>{muteAll ? "sound" : "mute"}</button>
       </div>
       <div className="card" id="counter">player position: {position}</div>
       <div className="card">
         <button onClick={() => setPlaying(playing => !playing)}>{playing ? "stop" : "play"}</button>
         <button onClick={() => {setPosition(-1)}}>rewind</button>
-        <button onClick={() => setMuteAll(mute => !mute)}>{muteAll ? "sound" : "mute"}</button>
       </div>
       <div className="controls">
         <div id="bpm">{bpm} bpm</div>
@@ -165,6 +170,7 @@ function App() {
           </div>
         </div>
       </SoundsContextMuteAll>
+      <APIClient hidden={browserHidden} onCloseClick={showHideBrowser} responseHandler={setComposition} />
     </>
   )
 }

@@ -1,4 +1,7 @@
 * TODO save/load
+** TODO refacton browser component name
+** TODO save
+** DONE load
 * TODO editor
 ** TODO add/delete lines
 ** TODO onMatraInputChange

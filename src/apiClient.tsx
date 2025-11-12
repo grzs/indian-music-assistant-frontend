@@ -50,7 +50,7 @@ function APIClient({ hidden, onCloseClick, responseHandler }) {
 
   return (
     <>
-      <div id="browser" hidden={hidden}>
+      <div id="browser" hidden={hidden} onClick={onCloseClick}>
         <div className="browser">
           <select defaultValue={compSlug} onChange={e => setCompSlug(e.target.value)}>
             <option value="default">-- select a composition --</option>
@@ -64,7 +64,7 @@ function APIClient({ hidden, onCloseClick, responseHandler }) {
           >
             load
           </button>
-          <button disabled={hidden} onClick={onCloseClick}>close browser</button>
+          <button className="btn-close" disabled={hidden} onClick={onCloseClick}>X</button>
         </div>
       </div>
     </>

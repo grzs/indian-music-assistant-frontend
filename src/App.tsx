@@ -21,11 +21,12 @@ function getCss(mainWidth, taalLength, division) {
   return `
 #taal .matra {width: ${mainWidth / taalLength}px;}
 #taal .beat {width: ${100 / division}%;}
+#composition .matra {width: ${(mainWidth / taalLength) / division}px;}
 `
 }
 
 function App() {
-  const [mainWidth, setMainWidth] = useState(1000)
+  const [mainWidth, setMainWidth] = useState(1200)
   const [position, setPosition] = useState(-1)
   const [taals, setTaals] = useState(testAppState.taals)
   const [taal, setTaal] = useState({angas: []})
@@ -78,7 +79,7 @@ function App() {
 
   function handleMatraSelect(matraPosition) {
     const newPosition = matraPosition * division
-    if (newPosition >= 0 && !playing) setPosition(Number(newPosition))
+    if (newPosition >= 0) setPosition(Number(newPosition))
   }
 
   function loadData() {
@@ -100,20 +101,41 @@ function App() {
       </div>
       */}
       <div className="card">
-        <button onClick={loadData}>load</button>
-        <button onClick={() => exportComposition(composition)}>export</button>
-        <button onClick={() => importComposition(setComposition)}>import</button>
-        <button onClick={() => setEditing((editing) => ! editing)}>
+        <button disabled={playing} onClick={loadData}>load</button>
+        <button disabled={playing} onClick={() => exportComposition(composition)}>export</button>
+        <button disabled={playing} onClick={() => importComposition(setComposition)}>import</button>
+        <button disabled={playing} onClick={() => setEditing((editing) => ! editing)}>
           {editing ? "stop" : "start"} editing
         </button>
+      </div>
+      <div className="card" id="counter">player position: {position}</div>
+      <div className="card">
         <button onClick={() => setPlaying(playing => !playing)}>{playing ? "stop" : "play"}</button>
-        <button onClick={() => {if (!playing) setPosition(-1)}}>rewind</button>
+        <button onClick={() => {setPosition(-1)}}>rewind</button>
         <button onClick={() => setMuteAll(mute => !mute)}>{muteAll ? "sound" : "mute"}</button>
       </div>
-      <div id="counter">player position: {position}</div>
+      <div className="controls">
+        <div id="bpm">{bpm} bpm</div>
+        <input
+          id="bpmslider"
+          type="range"
+          min="0" max="300" value={bpm}
+          onChange={e => setBpm(e.target.value)}
+          disabled={playing}
+        />
+        <div>
+          / <input
+            id="divisioninput"
+            type="number"
+            min="1" max="9" value={division}
+            onChange={e => setDivision(e.target.value)}
+            disabled={playing}
+          />
+        </div>
+      </div>
       <SoundsContextMuteAll value={muteAll}>
         <div id="main">
-          <h1>{composition.name}</h1>
+          <h2>{composition.name}</h2>
           <div id="taal">
             <Taal
               angas={taal.angas}
@@ -138,7 +160,7 @@ function App() {
                 e.target.dataset.type,
                 e.target.value,
               )}
-              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNrGlobal)}
+              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNr / division)}
             />
           </div>
         </div>

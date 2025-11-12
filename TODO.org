@@ -1,13 +1,17 @@
 * TODO save/load
 * TODO editor
 ** TODO add/delete lines
+** TODO onMatraInputChange
 * TODO transport panel
 ** TODO BPM multipliers
 ** TODO BPM changer
 * TODO sounds
+** TODO metronome for matras/beats
+switch metronome reference from main tempo to jati
 ** TODO sound list of matra
 ** DONE on/off
 * TODO loop range (dragstart/dragstop)
+* DONE refacton Composition component
 * DONE export/import
 * DONE theka anga signs
 * DONE separate level for sections within compositions (sthayi, antara, etc)

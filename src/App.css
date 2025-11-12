@@ -1,47 +1,52 @@
 #root {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1rem;
   text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
+/* .logo { */
+/*   height: 6em; */
+/*   padding: 1.5em; */
+/*   will-change: filter; */
+/*   transition: filter 300ms; */
+/* } */
+/* .logo:hover { */
+/*   filter: drop-shadow(0 0 2em #646cffaa); */
+/* } */
+/* .logo.react:hover { */
+/*   filter: drop-shadow(0 0 2em #61dafbaa); */
+/* } */
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+/* @keyframes logo-spin { */
+/*   from { */
+/*     transform: rotate(0deg); */
+/*   } */
+/*   to { */
+/*     transform: rotate(360deg); */
+/*   } */
+/* } */
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
+/* @media (prefers-reduced-motion: no-preference) { */
+/*   a:nth-of-type(2) .logo { */
+/*     animation: logo-spin infinite 20s linear; */
+/*   } */
+/* } */
 
 .card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+    padding: 1em;
 }
 
 /* changes starts from here */
+.controls {
+    padding: 1em;
+    margin: auto;
+    width: 500px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
 .matra.active {
     background-color: lightgray;
 }
@@ -77,39 +82,14 @@
 }
 
 /* composition */
-.composition .row {
-    display: flex;
-    flex-direction: row;
-}
-
-.composition .row h2 {
-    width: 125px;
-    text-align: right;
-    padding-right: 8px;
-}
-
-#composition .row h2 {
-    margin: 0;
-    padding-top: 8px;
-    border-bottom: 1px dotted black;
-}
-
-#composition .subsection.line {
+#composition .line {
     display: flex;
     flex-direction: row;
     border-bottom: 1px dotted black;
-}
-
-#composition .matra {
-    width: 60px;
 }
 
 #composition .matra input {
-    width: 50px;
-}
-
-#composition .symbol, #composition .number {
-    display: none;
+    width: 80%;
 }
 
 #composition input {

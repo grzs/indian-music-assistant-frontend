@@ -1,0 +1,11 @@
+#main {
+    width: 100%;
+}
+
+#taal .matra, #composition .matra {
+    width: 60px;
+}
+
+button, input, select, .controls div, .card, #counter {
+    display: none;
+}

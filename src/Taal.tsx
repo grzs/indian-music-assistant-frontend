@@ -25,8 +25,24 @@ function getBeatClass(position, beatIdx) {
   return classlist.join(" ")
 }
 
+function getActiveMatra(angas, position, division) {
+  if (position % division != 0) return {}
+  let matraPosition = position / division
+  for (let anga of angas) {
+    for (let matraIdx in anga.matras) {
+      if (matraIdx == 0 && matraPosition == 0) {
+        const matra = anga.matras[matraIdx]
+        matra["type"] = anga.type
+        return matra
+      } else matraPosition--
+    }
+  }
+  return {}
+}
+
 function Taal({angas, division, taalLength, globalPosition, playing}) {
   const [position, setPosition] = useState(0)
+  const [activeMatra, setActiveMatra] = useState({syllable: ""})
   const muteAll = useContext(SoundsContextMuteAll)
 
   useEffect(() => {
@@ -34,13 +50,17 @@ function Taal({angas, division, taalLength, globalPosition, playing}) {
   }, [taalLength, globalPosition])
 
   useEffect(() => {
+    const nextActiveMatra = getActiveMatra(angas, position, division)
+
     // TODO: it should be somewhere else, before any rendering ?
     // TODO: there should be a list of sounds to be played at a matra
     if (!muteAll && playing) {
-      if (position == 0) triggerSound("sam")
-      else triggerSound("click")
+      triggerSound(nextActiveMatra.type)
+      triggerSound("click")
     }
-  }, [position])
+
+    setActiveMatra(nextActiveMatra)
+  }, [angas, division, position])
 
   let matraCounter = 0
   let beatCounter = 0
@@ -50,12 +70,10 @@ function Taal({angas, division, taalLength, globalPosition, playing}) {
         {angas.map((anga, angaIdx) => (
           <div className="anga" key={angaIdx}>
             {anga.matras.map((matra, matraIdx) => (
-              <div className="matradiv"
-              >
+              <div className="matradiv" key={matraIdx}>
                 <div className="symbol">{getMatraSymbol(anga.type, angaIdx, matraIdx)}</div>
                 <div
                   className={getMatraClass(anga.type, matraIdx, position, division, matraCounter++)}
-                  key={matraIdx}
                   data-matra-nr={matraCounter}
                 >
                   <div className="syllable">{matra.syllable}</div>

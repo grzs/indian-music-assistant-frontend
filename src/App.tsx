@@ -48,7 +48,7 @@ function App() {
   const [taalDelay, setTaalDelay] = useState(0)
   const [compositionDelay, setCompositionDelay] = useState(1)
   const [taalLength, setTaalLength] = useState(0)
-  const [division, setDivision] = useState(2)
+  const [division, setDivision] = useState(1)
   const [muteAll, setMuteAll] = useState(true)
 
   useEffect(() => {

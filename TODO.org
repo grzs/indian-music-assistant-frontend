@@ -5,8 +5,8 @@
 ** TODO BPM multipliers
 ** TODO BPM changer
 * TODO sounds
-** TODO on/off
-** TODO sound list of mantra
+** TODO sound list of matra
+** DONE on/off
 * TODO loop range (dragstart/dragstop)
 * DONE export/import
 * DONE theka anga signs

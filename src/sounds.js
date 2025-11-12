@@ -7,7 +7,7 @@ const SoundsContextMuteAll = createContext(true)
 
 const sounds = {
   click: new Audio(click),
-  clap: new Audio(clap),
+  tali: new Audio(clap),
   sam: new Audio(chime),
 }
 

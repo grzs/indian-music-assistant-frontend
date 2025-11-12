@@ -79,207 +79,200 @@ export default {
     "name": "Anandi Jagabandi",
     "type": "bandish",
     "taal": "chau",
-    "sections": [
+    "lines": [
       {
-        "name": "sthayi",
-        "lines": [
+        "section": "sthayi",
+        "matras": [
           {
-            "matras": [
-              {
-                "syllable": "A",
-                "sargam": "P",
-                "bol": "/"
-              },
-              {
-                "syllable": "-",
-                "sargam": "m",
-                "bol": "-"
-              },
-              {
-                "syllable": "nan",
-                "sargam": "G",
-                "bol": "-"
-              },
-              {
-                "syllable": "-",
-                "sargam": "-",
-                "bol": "c"
-              },
-              {
-                "syllable": "di",
-                "sargam": "G",
-                "bol": "\\"
-              },
-              {
-                "syllable": "-",
-                "sargam": "R",
-                "bol": "-"
-              },
-              {
-                "syllable": "Ja",
-                "sargam": "S",
-                "bol": "/"
-              },
-              {
-                "syllable": "ga",
-                "sargam": "N",
-                "bol": "/"
-              },
-              {
-                "syllable": "-",
-                "sargam": "D",
-                "bol": "-"
-              },
-              {
-                "syllable": "ban",
-                "sargam": "N",
-                "bol": "/"
-              },
-              {
-                "syllable": "-",
-                "sargam": "R",
-                "bol": "-"
-              },
-              {
-                "syllable": "di",
-                "sargam": "s",
-                "bol": "\\"
-              }
-            ]
+            "syllable": "A",
+            "sargam": "P",
+            "bol": "/"
           },
           {
-            "matras":
-            [
-              {
-                "syllable": "A",
-                "sargam": "P",
-                "bol": "/"
-              },
-              {
-                "syllable": "-",
-                "sargam": "m",
-                "bol": "-"
-              },
-              {
-                "syllable": "nan",
-                "sargam": "G",
-                "bol": "-"
-              },
-              {
-                "syllable": "-",
-                "sargam": "-",
-                "bol": "c"
-              },
-              {
-                "syllable": "di",
-                "sargam": "G",
-                "bol": "\\"
-              },
-              {
-                "syllable": "-",
-                "sargam": "R",
-                "bol": "-"
-              },
-              {
-                "syllable": "Ja",
-                "sargam": "S",
-                "bol": "/"
-              },
-              {
-                "syllable": "ga",
-                "sargam": "N",
-                "bol": "/"
-              },
-              {
-                "syllable": "-",
-                "sargam": "D",
-                "bol": "-"
-              },
-              {
-                "syllable": "ban",
-                "sargam": "N",
-                "bol": "/"
-              },
-              {
-                "syllable": "-",
-                "sargam": "R",
-                "bol": "-"
-              },
-              {
-                "syllable": "di",
-                "sargam": "s",
-                "bol": "\\"
-              }
-            ]
+            "syllable": "-",
+            "sargam": "m",
+            "bol": "-"
           },
           {
-            "name": "sanchari",
-            "lines": [
-              {
-                "matras": [
-                  {
-                    "syllable": "A",
-                    "sargam": "P",
-                    "bol": "/"
-                  },
-                  {
-                    "syllable": "-",
-                    "sargam": "m",
-                    "bol": "-"
-                  },
-                  {
-                    "syllable": "nan",
-                    "sargam": "G",
-                    "bol": "-"
-                  },
-                  {
-                    "syllable": "-",
-                    "sargam": "-",
-                    "bol": "c"
-                  },
-                  {
-                    "syllable": "di",
-                    "sargam": "G",
-                    "bol": "\\"
-                  },
-                  {
-                    "syllable": "-",
-                    "sargam": "R",
-                    "bol": "-"
-                  },
-                  {
-                    "syllable": "Ja",
-                    "sargam": "S",
-                    "bol": "/"
-                  },
-                  {
-                    "syllable": "ga",
-                    "sargam": "N",
-                    "bol": "/"
-                  },
-                  {
-                    "syllable": "-",
-                    "sargam": "D",
-                    "bol": "-"
-                  },
-                  {
-                    "syllable": "ban",
-                    "sargam": "N",
-                    "bol": "/"
-                  },
-                  {
-                    "syllable": "-",
-                    "sargam": "R",
-                    "bol": "-"
-                  },
-                  {
-                    "syllable": "di",
-                    "sargam": "s",
-                    "bol": "\\"
-                  }
-                ]
-              }
-            ]
+            "syllable": "nan",
+            "sargam": "G",
+            "bol": "-"
+          },
+          {
+            "syllable": "-",
+            "sargam": "-",
+            "bol": "c"
+          },
+          {
+            "syllable": "di",
+            "sargam": "G",
+            "bol": "\\"
+          },
+          {
+            "syllable": "-",
+            "sargam": "R",
+            "bol": "-"
+          },
+          {
+            "syllable": "Ja",
+            "sargam": "S",
+            "bol": "/"
+          },
+          {
+            "syllable": "ga",
+            "sargam": "N",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "D",
+            "bol": "-"
+          },
+          {
+            "syllable": "ban",
+            "sargam": "N",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "R",
+            "bol": "-"
+          },
+          {
+            "syllable": "di",
+            "sargam": "s",
+            "bol": "\\"
+          }
+        ]
+      },
+      {
+        "section": "sthayi",
+        "matras":
+        [
+          {
+            "syllable": "A",
+            "sargam": "P",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "m",
+            "bol": "-"
+          },
+          {
+            "syllable": "nan",
+            "sargam": "G",
+            "bol": "-"
+          },
+          {
+            "syllable": "-",
+            "sargam": "-",
+            "bol": "c"
+          },
+          {
+            "syllable": "di",
+            "sargam": "G",
+            "bol": "\\"
+          },
+          {
+            "syllable": "-",
+            "sargam": "R",
+            "bol": "-"
+          },
+          {
+            "syllable": "Ja",
+            "sargam": "S",
+            "bol": "/"
+          },
+          {
+            "syllable": "ga",
+            "sargam": "N",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "D",
+            "bol": "-"
+          },
+          {
+            "syllable": "ban",
+            "sargam": "N",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "R",
+            "bol": "-"
+          },
+          {
+            "syllable": "di",
+            "sargam": "s",
+            "bol": "\\"
+          }
+        ]
+      },
+      {
+        "section": "sanchari",
+        "matras": [
+          {
+            "syllable": "A",
+            "sargam": "P",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "m",
+            "bol": "-"
+          },
+          {
+            "syllable": "nan",
+            "sargam": "G",
+            "bol": "-"
+          },
+          {
+            "syllable": "-",
+            "sargam": "-",
+            "bol": "c"
+          },
+          {
+            "syllable": "di",
+            "sargam": "G",
+            "bol": "\\"
+          },
+          {
+            "syllable": "-",
+            "sargam": "R",
+            "bol": "-"
+          },
+          {
+            "syllable": "Ja",
+            "sargam": "S",
+            "bol": "/"
+          },
+          {
+            "syllable": "ga",
+            "sargam": "N",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "D",
+            "bol": "-"
+          },
+          {
+            "syllable": "ban",
+            "sargam": "N",
+            "bol": "/"
+          },
+          {
+            "syllable": "-",
+            "sargam": "R",
+            "bol": "-"
+          },
+          {
+            "syllable": "di",
+            "sargam": "s",
+            "bol": "\\"
           }
         ]
       }

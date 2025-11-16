@@ -9,7 +9,7 @@ import './App.css'
 import { default as testAppState } from './testdata.js'
 
 import { Taal } from './Taal.tsx'
-import { Composition } from './Composition.tsx'
+import { Composition, EditContext } from './Composition.tsx'
 
 import { importComposition, exportComposition } from './filesystem.js'
 import { APIClient } from './apiClient.tsx'
@@ -32,6 +32,7 @@ function App() {
   const [taals, setTaals] = useState(testAppState.taals)
   const [taal, setTaal] = useState({angas: []})
   const [composition, setComposition] = useState({taal: "chau", lines: []}) // TODO: only in DEV
+  const [compositionChanged, setCompositionChanged] =useState(false)
   const [editing, setEditing] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [bpm, setBpm] = useState(60)
@@ -75,11 +76,22 @@ function App() {
     setBrowserHidden(!browserHidden)
   }
 
-  function handleMatraChange(sectionNr, subsectionNr, matraNr, itemType, value) {
+  function compositionSubmit(formData) {
     const nextComposition = Object.assign({}, composition)
-    nextComposition.sections = composition.sections.slice() // still doesn't enough, preserves references
-    nextComposition.sections[sectionNr].subsections[subsectionNr].matras[matraNr][itemType] = value;
+    let matraNr
+    let lineNr
+    let changed = false
+    formData.entries().forEach(([key, value]) => {
+      if (key == "matraNr") matraNr = value;
+      else if (key == "lineNr") lineNr = value;
+      else if (nextComposition.lines[lineNr].matras[matraNr][key] != value) {
+        nextComposition.lines[lineNr].matras[matraNr][key] = value
+        changed = true
+      }
+    })
     setComposition(nextComposition)
+    changed && setCompositionChanged(true)
+    setEditing(editing => !editing)
   }
 
   function handleMatraSelect(matraPosition) {
@@ -91,6 +103,7 @@ function App() {
     // TODO: implement this function
     const nextComposition = JSON.parse(JSON.stringify(testAppState.bandish))
     setComposition(nextComposition)
+    setCompositionChanged(false)
   }
 
   return (
@@ -107,11 +120,9 @@ function App() {
       */}
       <div className="card">
         <button disabled={playing} onClick={showHideBrowser}>{browserHidden ? "open" : "close"} browser</button>
+        <button disabled={playing || !compositionChanged} onClick={() => setCompositionChanged(!compositionChanged)}>save</button>
         <button disabled={playing} onClick={() => exportComposition(composition)}>export</button>
-        <button disabled={playing} onClick={() => importComposition(setComposition)}>import</button>
-        <button disabled={playing} onClick={() => setEditing((editing) => ! editing)}>
-          {editing ? "stop" : "start"} editing
-        </button>
+        <button disabled={playing} onClick={() => importComposition(setComposition, setCompositionChanged)}>import</button>
         <button onClick={() => setMuteAll(mute => !mute)}>{muteAll ? "sound" : "mute"}</button>
       </div>
       <div className="card" id="counter">player position: {position}</div>
@@ -130,17 +141,23 @@ function App() {
         />
         <div>
           / <input
-            id="divisioninput"
-            type="number"
-            min="1" max="9" value={division}
-            onChange={e => setDivision(e.target.value)}
-            disabled={playing}
+              id="divisioninput"
+              type="number"
+              min="1" max="9" value={division}
+              onChange={e => setDivision(e.target.value)}
+              disabled={playing}
           />
         </div>
       </div>
       <SoundsContextMuteAll value={muteAll}>
         <div id="main">
           <h2>{composition.name}</h2>
+          <div id="edit-buttons">
+            <button type="reset" form="compositionForm" disabled={playing} onClick={() => setEditing(editing => !editing)}>
+              {editing ? "cancel" : "edit"}
+            </button>
+            <button type="submit" form="compositionForm" hidden={!editing}>apply</button>
+          </div>
           <div id="taal">
             <Taal
               angas={taal.angas}
@@ -152,21 +169,18 @@ function App() {
             />
           </div>
           <div id="composition" className={editing ? "editing" : ""}>
-            <Composition
-              lines={composition.lines}
-              division={division}
-              taalLength={taalLength}
-              globalPosition={position}
-              playing={playing}
-              onMatraInputChange={e => handleMatraChange(
-                e.target.dataset.sectionNr,
-                e.target.dataset.subsectionNr,
-                e.target.dataset.matraNr,
-                e.target.dataset.type,
-                e.target.value,
-              )}
-              onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNr / division)}
-            />
+            <form id="compositionForm" action={compositionSubmit}>
+              <EditContext value={editing}>
+                <Composition
+                  composition={composition}
+                  division={division}
+                  taalLength={taalLength}
+                  globalPosition={position}
+                  playing={playing}
+                  onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNr / division)}
+                />
+              </EditContext>
+            </form>
           </div>
         </div>
       </SoundsContextMuteAll>

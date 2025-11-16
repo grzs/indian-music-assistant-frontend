@@ -4,12 +4,13 @@
 ** DONE load
 * TODO editor
 ** TODO add/delete lines
-** TODO onMatraInputChange
+** DONE onMatraInputChange
 * TODO transport panel
 ** TODO BPM multipliers
 ** TODO BPM changer
 * TODO sounds
-** TODO metronome for matras/beats
+** TODO howler.js
+** DONE metronome for matras/beats
 switch metronome reference from main tempo to jati
 ** TODO sound list of matra
 ** DONE on/off

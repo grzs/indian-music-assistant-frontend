@@ -1,24 +1,46 @@
 import { useState, useEffect, createContext, useContext } from 'react'
 
 const PositionContext = createContext(0)
+const EditContext = createContext(false)
 
 function Matra({ matra, onMatraSelect }) {
   const position = useContext(PositionContext)
+  const editing = useContext(EditContext)
   const matraClasslist = ["matra"]
 
-  if (position == Number(matra.matraNr)) matraClasslist.push("active")
+  if (position == Number(matra.matraNrGlobal)) matraClasslist.push("active")
   return (
     <>
-      <div className={matraClasslist.join(" ")} data-matra-nr={matra.matraNr} onClick={onMatraSelect}>
-        <div className="syllable" data-matra-nr={matra.matraNr}>{matra.syllable}</div>
-        <div className="sargam" data-matra-nr={matra.matraNr}>{matra.sargam}</div>
-        <div className="bol" data-matra-nr={matra.matraNr}>{matra.bol}</div>
+      <div className={matraClasslist.join(" ")} data-matra-nr={matra.matraNrGlobal} onClick={onMatraSelect}>
+        <input type="hidden" name="matraNr" value={matra.matraNr} />
+        <input type="hidden" name="lineNr" value={matra.lineNr} />
+        <input
+          className="syllable"
+          data-matra-nr={matra.matraNrGlobal}
+          name="syllable"
+          defaultValue={matra.syllable}
+          readOnly={!editing}
+        />
+        <input
+          className="sargam"
+          data-matra-nr={matra.matraNrGlobal}
+          name="sargam"
+          defaultValue={matra.sargam}
+          readOnly={!editing}
+        />
+        <input
+          className="bol"
+          data-matra-nr={matra.matraNrGlobal}
+          name="bol"
+          defaultValue={matra.bol}
+          readOnly={!editing}
+        />
       </div>
     </>
   )
 }
 
-function Composition({ lines, taalLength, division, globalPosition, playing, onMatraSelect, onMatraInputChange }) {
+function Composition({ composition, taalLength, division, globalPosition, playing, onMatraSelect }) {
   const [matras, setMatras] = useState([])
   const [position, setPosition] = useState(0)
   const [taalLengthBeats, setTaalLengthBeats] = useState(0)
@@ -30,21 +52,23 @@ function Composition({ lines, taalLength, division, globalPosition, playing, onM
 
   useEffect(() => {
     const nextMatras = []
+    const lines = composition.lines
 
     let counter = 0
     for (let lineIdx in lines) {
       let line = lines[lineIdx]
-      for (let matra of line.matras) {
+      for (let matraIdx in line.matras) {
         let newMatra = {}
-        Object.assign(newMatra, matra)
+        Object.assign(newMatra, line.matras[matraIdx])
         newMatra["section"] = line.section
         newMatra["lineNr"] = lineIdx
-        newMatra["matraNr"] = counter++
+        newMatra["matraNr"] = matraIdx
+        newMatra["matraNrGlobal"] = counter++
         nextMatras.push(newMatra)
       }
     }
     setMatras(nextMatras)
-  }, [lines])
+  }, [composition])
 
   useEffect(() => {
     setPosition(globalPosition % matras.length)
@@ -83,4 +107,4 @@ function Composition({ lines, taalLength, division, globalPosition, playing, onM
   )
 }
 
-export { Composition }
+export { Composition, EditContext }

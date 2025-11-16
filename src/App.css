@@ -90,15 +90,26 @@
 
 #composition .matra input {
     width: 80%;
+    text-align: center;
 }
 
-#composition input {
-    display: none;
+#composition .matra input:read-only {
+    width: 80%;
+    border: none;
+    outline: none;
 }
 
-#composition.editing input {
-    display: unset;
+#composition .matra.active input:read-only {
+    background-color: lightgray;
 }
+
+/* #composition input { */
+/*     display: none; */
+/* } */
+
+/* #composition.editing input { */
+/*     display: unset; */
+/* } */
 
 #composition div.matraitem {
     display: unset;
@@ -106,4 +117,14 @@
 
 #composition.editing div.matraitem {
     display: none;
+}
+
+#edit-buttons {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 1em;
+}
+
+#edit-buttons button {
+    width: 90px;
 }

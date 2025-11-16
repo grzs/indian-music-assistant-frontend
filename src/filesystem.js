@@ -7,9 +7,12 @@ const filePickerOpts = {
   ],
 };
 
-function importComposition(importHandler) {
+function importComposition(importHandler, setChanged) {
   const reader = new FileReader();
-  reader.onload = () => importHandler(JSON.parse(reader.result));
+  reader.onload = () => {
+    importHandler(JSON.parse(reader.result))
+    setChanged(false)
+  };
 
   window.showOpenFilePicker(filePickerOpts)
     .then(fileHandles => fileHandles[0].getFile())

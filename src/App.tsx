@@ -68,6 +68,10 @@ function App() {
 
   }, [playing, bpm, division])
 
+  useEffect(() => {
+    setPosition(-1)
+  }, [editing])
+
   function triggerStep() {
     setPosition(position => Number(position) + 1)
   }
@@ -78,23 +82,39 @@ function App() {
 
   function compositionSubmit(formData) {
     const nextComposition = Object.assign({}, composition)
+    const oldLines = nextComposition.lines.slice()
+    nextComposition.lines = []
+
     let matraNr
     let lineNr
     let changed = false
     formData.entries().forEach(([key, value]) => {
-      if (key == "matraNr") matraNr = value;
-      else if (key == "lineNr") lineNr = value;
-      else if (nextComposition.lines[lineNr].matras[matraNr][key] != value) {
+      if (key == "lineNr") {
+        lineNr = value
+        if (nextComposition.lines[lineNr] === undefined) nextComposition.lines[lineNr] = {"matras": []}
+      }
+      else if (key == "section" && nextComposition.lines[lineNr].section === undefined)
+        nextComposition.lines[lineNr].section = value;
+      else if (key == "matraNr") {
+        matraNr = value
+        nextComposition.lines[lineNr].matras[matraNr] = {}
+      }
+      else if (["syllable", "sargam", "bol"].includes(key)) {
+        // check if changed
+        let oldMatra = oldLines[lineNr].matras[matraNr] || {};
+        if (oldMatra[key] == value) changed = true
+
+        // set new value
         nextComposition.lines[lineNr].matras[matraNr][key] = value
-        changed = true
       }
     })
     setComposition(nextComposition)
     changed && setCompositionChanged(true)
     setEditing(editing => !editing)
-  }
-
+  
+}
   function handleMatraSelect(matraPosition) {
+    if (editing) {return}
     const newPosition = matraPosition * division
     if (newPosition >= 0) setPosition(Number(newPosition))
   }
@@ -119,7 +139,7 @@ function App() {
       </div>
       */}
       <div className="card">
-        <button disabled={playing} onClick={showHideBrowser}>{browserHidden ? "open" : "close"} browser</button>
+        <button disabled={playing || !browserHidden} onClick={showHideBrowser}>load</button>
         <button disabled={playing || !compositionChanged} onClick={() => setCompositionChanged(!compositionChanged)}>save</button>
         <button disabled={playing} onClick={() => exportComposition(composition)}>export</button>
         <button disabled={playing} onClick={() => importComposition(setComposition, setCompositionChanged)}>import</button>

@@ -178,20 +178,22 @@ function Line({ lineNr, matras, onMatraSelect, onMatraDelete, onMatraAdd }) {
             defaultValue={matra.bol}
             readOnly={!editing}
           />
-          <button
-            type="button"
-            className="addBtn"
-            data-matra-nr={matra.matraNrGlobal}
-            onClick={onMatraAdd}
-            hidden={!editing}
-          >+</button>
-          <button
-            type="button"
-            className="removeBtn"
-            data-matra-nr={matra.matraNrGlobal}
-            onClick={onMatraDelete}
-            hidden={!editing}
-          >X</button>
+          <div className="buttons">
+            <button
+              type="button"
+              className="addBtn"
+              data-matra-nr={matra.matraNrGlobal}
+              onClick={onMatraAdd}
+              hidden={!editing}
+            >+</button>
+            <button
+              type="button"
+              className="removeBtn"
+              data-matra-nr={matra.matraNrGlobal}
+              onClick={onMatraDelete}
+              hidden={!editing}
+            >-</button>
+          </div>
         </div>
       ))}
     </div>

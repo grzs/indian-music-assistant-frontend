@@ -103,6 +103,20 @@
     background-color: lightgray;
 }
 
+#composition .matra .buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 10%;
+    height: 20px;
+}
+
+#composition .matra .buttons button {
+    width: 20px;
+    text-align: center;
+    padding: 0;
+}
+
 /* #composition input { */
 /*     display: none; */
 /* } */

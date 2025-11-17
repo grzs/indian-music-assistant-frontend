@@ -3,11 +3,12 @@ import { useState, useEffect, createContext, useContext } from 'react'
 const PositionContext = createContext(0)
 const EditContext = createContext(false)
 
-function Composition({ composition, taalLength, division, globalPosition, playing, onMatraSelect }) {
+function Composition({ composition, taalLength, division, globalPosition, playing, onMatraSelect, onMatraAdd }) {
   const [matras, setMatras] = useState([])
   const [position, setPosition] = useState(0)
   const [taalLengthBeats, setTaalLengthBeats] = useState(0)
   const [lines, setLines] = useState([])
+  const editing = useContext(EditContext)
   // TODO: to state 'linelength', 'linenumbers', 'lastlinestart'
 
   useEffect(() => {
@@ -56,18 +57,58 @@ function Composition({ composition, taalLength, division, globalPosition, playin
   }, [taalLengthBeats, matras])
 
   function onMatraDelete(e) {
-    const matraNr = e.target.dataset.matraNr
+    var matraNr = e.target.dataset.matraNr
     const nextMatras = []
 
     let newMatra
     let count = 0
     for (let matra of matras) {
-      if (count != matraNr) {
+      if (count == matraNr) {
+        matraNr = -1
+      } else {
         newMatra = Object.assign({}, matra)
-        newMatra.matraNrGlobal = count
+        newMatra.matraNrGlobal = count++
         nextMatras.push(newMatra)
       }
-      count++
+    }
+    setMatras(nextMatras)
+  }
+
+  function copyMatra(oldMatra, count, lineNr, matraNr, offset) {
+    let defaultSection = "sthayi"
+    let newMatra = Object.assign({}, oldMatra)
+    newMatra.lineNr = lineNr
+    newMatra.matraNr = Number(matraNr) + offset
+    newMatra.section = oldMatra.section || defaultSection
+    newMatra.matraNrGlobal = count
+    return newMatra
+  }
+
+  function onMatraAdd(e) {
+    const matraNr = e.target.dataset.matraNr
+    const nextMatras = []
+    const emptyMatra = {syllable: "", sargam: "", bol: ""}
+    
+    let newMatra
+    let count = 0
+    let offset = 0
+    let newLineNr = 0
+    let newMatraNr = 0
+    for (let matra of matras) {
+      // reset the offset when starting a new line
+      if (matra.lineNr != newLineNr) offset = 0
+      newLineNr = matra.lineNr
+
+      if (count == matraNr) {
+        newMatra = copyMatra(emptyMatra, count++, newLineNr, matra.matraNr, offset++)
+        nextMatras.push(newMatra)
+      }
+      newMatra = copyMatra(matra, count++, newLineNr, matra.matraNr, offset)
+      nextMatras.push(newMatra)
+    }
+    if (matraNr == -1) {
+      newMatra = copyMatra(emptyMatra, count++, ++newLineNr, 0, 0)
+      nextMatras.push(newMatra)
     }
     setMatras(nextMatras)
   }
@@ -78,11 +119,21 @@ function Composition({ composition, taalLength, division, globalPosition, playin
         {lines.map((line, lineIdx) => (
           <Line
             key={lineIdx}
+            lineNr={lineIdx}
             matras={line}
             onMatraSelect={onMatraSelect}
             onMatraDelete={onMatraDelete}
+            onMatraAdd={onMatraAdd}
           />
         ))}
+        <div hidden={!editing}>
+          <button
+            type="button"
+            className="addBtn"
+            data-matra-nr="-1"
+            onClick={onMatraAdd}
+          >append empty matra</button>
+        </div>
       </PositionContext>
     </>
   )
@@ -91,7 +142,7 @@ function Composition({ composition, taalLength, division, globalPosition, playin
   )
 }
 
-function Line({ matras, onMatraSelect, onMatraDelete }) {
+function Line({ lineNr, matras, onMatraSelect, onMatraDelete, onMatraAdd }) {
   const position = useContext(PositionContext)
   const editing = useContext(EditContext)
   return (
@@ -127,13 +178,20 @@ function Line({ matras, onMatraSelect, onMatraDelete }) {
             defaultValue={matra.bol}
             readOnly={!editing}
           />
-          <button type="button"
+          <button
+            type="button"
+            className="addBtn"
+            data-matra-nr={matra.matraNrGlobal}
+            onClick={onMatraAdd}
             hidden={!editing}
+          >+</button>
+          <button
+            type="button"
+            className="removeBtn"
             data-matra-nr={matra.matraNrGlobal}
             onClick={onMatraDelete}
-          >
-            X
-          </button>
+            hidden={!editing}
+          >X</button>
         </div>
       ))}
     </div>

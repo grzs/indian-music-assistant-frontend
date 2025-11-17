@@ -4,6 +4,7 @@
 ** DONE load
 * TODO editor
 ** TODO add/delete lines
+*** TODO consolidate visible and db lines
 ** DONE onMatraInputChange
 * TODO transport panel
 ** TODO BPM multipliers

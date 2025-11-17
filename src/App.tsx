@@ -101,7 +101,14 @@ function App() {
       }
       else if (["syllable", "sargam", "bol"].includes(key)) {
         // check if changed
-        let oldMatra = oldLines[lineNr].matras[matraNr] || {};
+        let oldMatra
+        try {
+          oldMatra = oldLines[lineNr].matras[matraNr] || {}
+        } catch (error) {
+          if (error.name == "TypeError") oldMatra = {}
+          else throw error
+        }
+
         if (oldMatra[key] == value) changed = true
 
         // set new value

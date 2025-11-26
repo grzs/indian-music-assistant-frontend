@@ -1,74 +1,91 @@
-import { useState } from 'react'
-import './Browser.css'
+import { useState } from 'react';
+import './Browser.css';
 
 function fetchComposition(baseUrl, apiVersion, slug, responseHandler) {
-  let url = [baseUrl, "api", apiVersion, "compositions", slug].join("/");
+  let url = [baseUrl, 'api', apiVersion, 'compositions', slug].join('/');
 
   fetch(url)
-    .then((response) => {
+    .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error: ${response.status}`);
       }
       return response.text();
     })
-    .then((text) => {
+    .then(text => {
       let compositionData = JSON.parse(text);
       responseHandler(compositionData);
     })
-    .catch((error) => {
+    .catch(error => {
       window.alert(`Could not fetch composition: ${error}`);
     });
 }
 
 function updateComposition(baseUrl, apiVersion, data) {
-  let url = [baseUrl, "api", apiVersion, "compositions", data["slug"]].join("/");
+  let url = [baseUrl, 'api', apiVersion, 'compositions', data['slug']].join(
+    '/',
+  );
 
   fetch(url, {
-    method: "PUT",
-    headers: {"Content-Type": "application/json"},
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
-    .then((response) => {
+    .then(response => {
       if (!response.ok) {
         throw new Error(`HTTP error: ${response.status}`);
       }
       return response;
     })
-    .then((response) => {
+    .then(response => {
       console.log(response);
     })
-    .catch((error) => {
+    .catch(error => {
       window.alert(`Could not update composition: ${error}`);
     });
 }
 
 function APIClient({ hidden, onCloseClick, responseHandler }) {
-  const [apiVersion, setApiVersion] = useState("v1")
-  const [baseUrl, setBaseUrl] = useState("http://localhost:8000")
-  const [compSlug, setCompSlug] = useState("default")
-  const [compositions, setCompositions] = useState([{slug: "anandi-jagabandi", name: "Anandi Jagabandi"}])
+  const [apiVersion, setApiVersion] = useState('v1');
+  const [baseUrl, setBaseUrl] = useState('http://localhost:8000');
+  const [compSlug, setCompSlug] = useState('default');
+  const [compositions, setCompositions] = useState([
+    { slug: 'anandi-jagabandi', name: 'Anandi Jagabandi' },
+  ]);
 
   return (
     <>
       <div id="browser" hidden={hidden}>
         <div className="browser">
-          <select defaultValue={compSlug} onChange={e => setCompSlug(e.target.value)}>
+          <select
+            defaultValue={compSlug}
+            onChange={e => setCompSlug(e.target.value)}
+          >
             <option value="default">-- select a composition --</option>
             {compositions.map((comp, i) => (
-              <option key={i} value={comp.slug}>{comp.name}</option>
+              <option key={i} value={comp.slug}>
+                {comp.name}
+              </option>
             ))}
           </select>
           <button
-            disabled={compSlug == "default"}
-            onClick={() => fetchComposition(baseUrl, apiVersion, compSlug, responseHandler)}
+            disabled={compSlug == 'default'}
+            onClick={() =>
+              fetchComposition(baseUrl, apiVersion, compSlug, responseHandler)
+            }
           >
             load
           </button>
-          <button className="btn-close" disabled={hidden} onClick={onCloseClick}>X</button>
+          <button
+            className="btn-close"
+            disabled={hidden}
+            onClick={onCloseClick}
+          >
+            X
+          </button>
         </div>
       </div>
     </>
-  )
+  );
 }
 
-export { APIClient }
+export { APIClient };

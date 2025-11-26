@@ -1,136 +1,138 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 // import viteLogo from '/vite.svg'
 
-import { SoundsContextMuteAll } from './sounds.js'
+import { SoundsContextMuteAll } from './sounds.js';
 
-import './App.css'
+import './App.css';
 
-import { default as testAppState } from './testdata.js'
+import { default as testAppState } from './testdata.js';
 
-import { Taal } from './Taal.tsx'
-import { Composition, EditContext } from './Composition.tsx'
+import { Taal } from './Taal.tsx';
+import { Composition, EditContext } from './Composition.tsx';
 
-import { importComposition, exportComposition } from './filesystem.js'
-import { APIClient } from './apiClient.tsx'
+import { importComposition, exportComposition } from './filesystem.js';
+import { APIClient } from './apiClient.tsx';
 
 function getMatrasFlattened(angas) {
-  return angas.map(anga => anga.matras.map(matra => matra)).flat(2)
+  return angas.map(anga => anga.matras.map(matra => matra)).flat(2);
 }
 
 function getCss(mainWidth, taalLength, division) {
   return `
 #taal .matra {width: ${mainWidth / taalLength}px;}
 #taal .beat {width: ${100 / division}%;}
-#composition .matra {width: ${(mainWidth / taalLength) / division}px;}
-`
+#composition .matra {width: ${mainWidth / taalLength / division}px;}
+`;
 }
 
 function App() {
-  const [mainWidth, setMainWidth] = useState(1200)
-  const [position, setPosition] = useState(-1)
-  const [taals, setTaals] = useState(testAppState.taals)
-  const [taal, setTaal] = useState({angas: []})
-  const [composition, setComposition] = useState({taal: "chau", lines: []}) // TODO: only in DEV
-  const [compositionChanged, setCompositionChanged] =useState(false)
-  const [editing, setEditing] = useState(false)
-  const [playing, setPlaying] = useState(false)
-  const [bpm, setBpm] = useState(60)
-  const [loop, setLoop] = useState()
-  const [taalLength, setTaalLength] = useState(0)
-  const [division, setDivision] = useState(1)
-  const [muteAll, setMuteAll] = useState(true)
-  const [browserHidden, setBrowserHidden] = useState(true)
+  const [mainWidth, setMainWidth] = useState(1200);
+  const [position, setPosition] = useState(-1);
+  const [taals, setTaals] = useState(testAppState.taals);
+  const [taal, setTaal] = useState({ angas: [] });
+  const [composition, setComposition] = useState({ taal: 'chau', lines: [] }); // TODO: only in DEV
+  const [compositionChanged, setCompositionChanged] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const [bpm, setBpm] = useState(60);
+  const [loop, setLoop] = useState();
+  const [taalLength, setTaalLength] = useState(0);
+  const [division, setDivision] = useState(1);
+  const [muteAll, setMuteAll] = useState(true);
+  const [browserHidden, setBrowserHidden] = useState(true);
 
   useEffect(() => {
-    const matrasFlattened = getMatrasFlattened(taal.angas)
-    setTaalLength(matrasFlattened.length)
-  }, [taal])
+    const matrasFlattened = getMatrasFlattened(taal.angas);
+    setTaalLength(matrasFlattened.length);
+  }, [taal]);
 
   useEffect(() => {
-    const nextTaal = {angas: taal.angas.slice()}
-    if (composition.taal) nextTaal.angas = taals[composition.taal].angas
-    setTaal(nextTaal)
-    setBrowserHidden(true)
-  }, [composition])
+    const nextTaal = { angas: taal.angas.slice() };
+    if (composition.taal) nextTaal.angas = taals[composition.taal].angas;
+    setTaal(nextTaal);
+    setBrowserHidden(true);
+  }, [composition]);
 
   useEffect(() => {
-    const interval = 60000 / bpm / division
-    let nextLoop = loop
+    const interval = 60000 / bpm / division;
+    let nextLoop = loop;
 
-    if (playing) nextLoop = setInterval(triggerStep, interval)
+    if (playing) nextLoop = setInterval(triggerStep, interval);
     else {
-      clearInterval(loop)
-      nextLoop = undefined
+      clearInterval(loop);
+      nextLoop = undefined;
     }
 
-    setLoop(nextLoop)
-
-  }, [playing, bpm, division])
+    setLoop(nextLoop);
+  }, [playing, bpm, division]);
 
   useEffect(() => {
-    setPosition(-1)
-  }, [editing])
+    setPosition(-1);
+  }, [editing]);
 
   function triggerStep() {
-    setPosition(position => Number(position) + 1)
+    setPosition(position => Number(position) + 1);
   }
 
   function showHideBrowser() {
-    setBrowserHidden(!browserHidden)
+    setBrowserHidden(!browserHidden);
   }
 
   function compositionSubmit(formData) {
-    const nextComposition = Object.assign({}, composition)
-    const oldLines = nextComposition.lines.slice()
-    nextComposition.lines = []
+    const nextComposition = Object.assign({}, composition);
+    const oldLines = nextComposition.lines.slice();
+    nextComposition.lines = [];
 
-    let matraNr
-    let lineNr
-    let changed = false
+    let matraNr;
+    let lineNr;
+    let changed = false;
     formData.entries().forEach(([key, value]) => {
-      if (key == "lineNr") {
-        lineNr = value
-        if (nextComposition.lines[lineNr] === undefined) nextComposition.lines[lineNr] = {"matras": []}
-      }
-      else if (key == "section" && nextComposition.lines[lineNr].section === undefined)
+      if (key == 'lineNr') {
+        lineNr = value;
+        if (nextComposition.lines[lineNr] === undefined)
+          nextComposition.lines[lineNr] = { matras: [] };
+      } else if (
+        key == 'section' &&
+        nextComposition.lines[lineNr].section === undefined
+      )
         nextComposition.lines[lineNr].section = value;
-      else if (key == "matraNr") {
-        matraNr = value
-        nextComposition.lines[lineNr].matras[matraNr] = {}
-      }
-      else if (["syllable", "sargam", "bol"].includes(key)) {
+      else if (key == 'matraNr') {
+        matraNr = value;
+        nextComposition.lines[lineNr].matras[matraNr] = {};
+      } else if (['syllable', 'sargam', 'bol'].includes(key)) {
         // check if changed
-        let oldMatra
+        let oldMatra;
         try {
-          oldMatra = oldLines[lineNr].matras[matraNr] || {}
+          oldMatra = oldLines[lineNr].matras[matraNr] || {};
         } catch (error) {
-          if (error.name == "TypeError") oldMatra = {}
-          else throw error
+          if (error.name == 'TypeError') oldMatra = {};
+          else throw error;
         }
 
-        if (oldMatra[key] == value) changed = true
+        if (oldMatra[key] == value) changed = true;
 
         // set new value
-        nextComposition.lines[lineNr].matras[matraNr][key] = value
+        nextComposition.lines[lineNr].matras[matraNr][key] = value;
       }
-    })
-    setComposition(nextComposition)
-    changed && setCompositionChanged(true)
-    setEditing(editing => !editing)
-  
-}
+    });
+    setComposition(nextComposition);
+    changed && setCompositionChanged(true);
+    setEditing(editing => !editing);
+  }
   function handleMatraSelect(matraPosition) {
-    if (editing) {return}
-    const newPosition = matraPosition * division
-    if (newPosition >= 0) setPosition(Number(newPosition))
+    if (editing) {
+      return;
+    }
+    const newPosition = matraPosition * division;
+    if (newPosition >= 0) setPosition(Number(newPosition));
   }
 
   function loadTestData() {
     // TODO: implement this function
-    const nextComposition = JSON.parse(JSON.stringify(testAppState.bandish))
-    setComposition(nextComposition)
-    setCompositionChanged(false)
+    const nextComposition = JSON.parse(JSON.stringify(testAppState.bandish));
+    setComposition(nextComposition);
+    setCompositionChanged(false);
   }
 
   return (
@@ -146,33 +148,69 @@ function App() {
       </div>
       */}
       <div className="card">
-        <button disabled={playing || !browserHidden} onClick={showHideBrowser}>load</button>
-        <button disabled={playing || !compositionChanged} onClick={() => setCompositionChanged(!compositionChanged)}>save</button>
-        <button disabled={playing} onClick={() => exportComposition(composition)}>export</button>
-        <button disabled={playing} onClick={() => importComposition(setComposition, setCompositionChanged)}>import</button>
-        <button onClick={() => setMuteAll(mute => !mute)}>{muteAll ? "sound" : "mute"}</button>
+        <button disabled={playing || !browserHidden} onClick={showHideBrowser}>
+          load
+        </button>
+        <button
+          disabled={playing || !compositionChanged}
+          onClick={() => setCompositionChanged(!compositionChanged)}
+        >
+          save
+        </button>
+        <button
+          disabled={playing}
+          onClick={() => exportComposition(composition)}
+        >
+          export
+        </button>
+        <button
+          disabled={playing}
+          onClick={() =>
+            importComposition(setComposition, setCompositionChanged)
+          }
+        >
+          import
+        </button>
+        <button onClick={() => setMuteAll(mute => !mute)}>
+          {muteAll ? 'sound' : 'mute'}
+        </button>
       </div>
-      <div className="card" id="counter">player position: {position}</div>
+      <div className="card" id="counter">
+        player position: {position}
+      </div>
       <div className="card">
-        <button onClick={() => setPlaying(playing => !playing)}>{playing ? "stop" : "play"}</button>
-        <button onClick={() => {setPosition(-1)}}>rewind</button>
+        <button onClick={() => setPlaying(playing => !playing)}>
+          {playing ? 'stop' : 'play'}
+        </button>
+        <button
+          onClick={() => {
+            setPosition(-1);
+          }}
+        >
+          rewind
+        </button>
       </div>
       <div className="controls">
         <div id="bpm">{bpm} bpm</div>
         <input
           id="bpmslider"
           type="range"
-          min="0" max="300" value={bpm}
+          min="0"
+          max="300"
+          value={bpm}
           onChange={e => setBpm(e.target.value)}
           disabled={playing}
         />
         <div>
-          / <input
-              id="divisioninput"
-              type="number"
-              min="1" max="9" value={division}
-              onChange={e => setDivision(e.target.value)}
-              disabled={playing}
+          /{' '}
+          <input
+            id="divisioninput"
+            type="number"
+            min="1"
+            max="9"
+            value={division}
+            onChange={e => setDivision(e.target.value)}
+            disabled={playing}
           />
         </div>
       </div>
@@ -180,10 +218,17 @@ function App() {
         <div id="main">
           <h2>{composition.name}</h2>
           <div id="edit-buttons">
-            <button type="reset" form="compositionForm" disabled={playing} onClick={() => setEditing(editing => !editing)}>
-              {editing ? "cancel" : "edit"}
+            <button
+              type="reset"
+              form="compositionForm"
+              disabled={playing}
+              onClick={() => setEditing(editing => !editing)}
+            >
+              {editing ? 'cancel' : 'edit'}
             </button>
-            <button type="submit" form="compositionForm" hidden={!editing}>apply</button>
+            <button type="submit" form="compositionForm" hidden={!editing}>
+              apply
+            </button>
           </div>
           <div id="taal">
             <Taal
@@ -195,7 +240,7 @@ function App() {
               onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNr)}
             />
           </div>
-          <div id="composition" className={editing ? "editing" : ""}>
+          <div id="composition" className={editing ? 'editing' : ''}>
             <form id="compositionForm" action={compositionSubmit}>
               <EditContext value={editing}>
                 <Composition
@@ -204,16 +249,22 @@ function App() {
                   taalLength={taalLength}
                   globalPosition={position}
                   playing={playing}
-                  onMatraSelect={e => handleMatraSelect(e.target.dataset.matraNr / division)}
+                  onMatraSelect={e =>
+                    handleMatraSelect(e.target.dataset.matraNr / division)
+                  }
                 />
               </EditContext>
             </form>
           </div>
         </div>
       </SoundsContextMuteAll>
-      <APIClient hidden={browserHidden} onCloseClick={showHideBrowser} responseHandler={setComposition} />
+      <APIClient
+        hidden={browserHidden}
+        onCloseClick={showHideBrowser}
+        responseHandler={setComposition}
+      />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
